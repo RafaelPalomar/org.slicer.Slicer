@@ -1,0 +1,13 @@
+diff --git a/SuperBuild.cmake b/SuperBuild.cmake
+index 51eabb7d9d..9436412b6b 100644
+--- a/SuperBuild.cmake
++++ b/SuperBuild.cmake
+@@ -22,7 +22,7 @@
+ #-----------------------------------------------------------------------------
+ # CMake https support
+ #-----------------------------------------------------------------------------
+-include(SlicerCheckCMakeHTTPS)
++#include(SlicerCheckCMakeHTTPS)
+ 
+ #-----------------------------------------------------------------------------
+ # Git protocol option
