@@ -20,7 +20,7 @@ modules:
   - name: Slicer
     buildsystem: simple
     build-commands:
-      - cmake -S . -B Release -DCMAKE_BUILD_TYPE:STRING=Release
+      - cmake -S . -B Release -DCMAKE_BUILD_TYPE:STRING=Release -DSlicer_USE_SYSTEM_LibFFI:BOOL=ON
         -DSlicer_bzip2_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/bzip2.git
         -DSlicer_CTKAppLauncherLib_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTKAppLauncherLib.git
         -DSlicer_CTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTK.git
