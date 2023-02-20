@@ -1,0 +1,135 @@
+app-id: org.slicer.Slicer
+runtime: org.kde.Platform
+runtime-version: '5.15'
+sdk: org.kde.Sdk
+# KDE runtime environment does not provide the QtWebEngine component
+# required for 3D Slicer
+base: io.qt.qtwebengine.BaseApp
+base-version: '5.15-22.08'
+command: Slicer
+finish-args:
+  - |
+      --device=dri
+      --share=network
+      --share=ipc
+      --socket=x11
+      --device=dri
+      --filesystem=host
+      --socket=wayland
+modules:
+  - name: Slicer
+    buildsystem: simple
+    build-commands:
+      - cmake -S . -B Release -DCMAKE_BUILD_TYPE:STRING=Release
+        -DSlicer_bzip2_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/bzip2.git
+        -DSlicer_CTKAppLauncherLib_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTKAppLauncherLib.git
+        -DSlicer_CTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTK.git
+        -DSlicer_curl_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/curl.git
+        -DSlicer_DCMTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/DCMTK.git
+        -DSlicer_ITK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/ITK.git
+        -DSlicer_JsonCpp_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/JsonCpp.git
+        -DSlicer_LibArchive_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LibArchive.git
+        -DSlicer_LibFFI_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LibFFI.git
+        -DSlicer_LZMA_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LZMA.git
+        -DSlicer_python_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/python.git
+        -DSlicer_qRestAPI_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/qRestAPI.git
+        -DSlicer_RapidJSON_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/RapidJSON.git
+        -DSlicer_SimpleITK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/SimpleITK.git
+        -DSlicer_SlicerExecutionModel_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/SlicerExecutionModel.git
+        -DSlicer_sqlite_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/sqlite.git
+        -DSlicer_teem_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/teem.git
+        -DSlicer_VTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/VTK.git
+        -DSlicer_zlib_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/zlib.git
+        -DSlicer_OpenSSL_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/openssl-1.1.1g-pr12238.tar.gz
+      - cmake --build Release
+    sources:
+      - type: git
+        url: https://github.com/Slicer/Slicer.git
+        tag: main
+      - type: patch
+        path: 01-ENH-Disable-https-check.patch
+      - type: patch
+        path: 02-ENH-Disable-git-submodules-in-RapidJSON.cmake
+      - type: patch
+        path: 03-ENH-Make-OpenSSL-sources-visible.patch
+      - type: git
+        url: https://github.com/commontk/bzip2
+        tag: 391dddabd24aee4a06e10ab6636f26dd93c21308
+        dest: dependencies/bzip2.git
+      - type: git
+        url: https://github.com/commontk/AppLauncher
+        tag: 8759e03985738b8a8f3eb74ab516ba4e8ef29988
+        dest: dependencies/CTKAppLauncherLib.git
+      - type: git
+        url: https://github.com/commontk/CTK
+        tag: 95dac75b80562b81db10555db5807648f4d17dee
+        dest: dependencies/CTK.git
+      - type: git
+        url: https://github.com/Slicer/curl
+        tag: d73e360a78d97adda85364e6bd5c504a2eb1572a
+        dest: dependencies/curl.git
+      - type: git
+        url: https://github.com/commontk/DCMTK
+        tag: 0f9bf4d9e9a778c11fdddafca691b451c2b621bc
+        dest: dependencies/DCMTK.git
+      - type: git
+        url: https://github.com/Slicer/ITK
+        tag: 9745ba2fae8abf31175deae87ff3e55e81c0a663
+        dest: dependencies/ITK.git
+      - type: git
+        url: https://github.com/Slicer/jsoncpp
+        tag: 73b8e172d6615251ef851d883ef02f163e7075b2
+        dest: dependencies/JsonCpp.git
+      - type: git
+        url: https://github.com/libarchive/libarchive
+        tag: 6c3301111caa75c76e1b2acb1afb2d71341932ef
+        dest: dependencies/LibArchive.git
+      - type: git
+        url: https://github.com/python-cmake-buildsystem/libffi
+        tag: e8599d9d5a50841c11a5ff8e3438dd12f080b096
+        dest: dependencies/LibFFI.git
+      - type: git
+        url: https://github.com/xz-mirror/xz
+        tag: v5.2.5
+        dest: dependencies/LZMA.git
+      - type: git
+        url: https://github.com/python-cmake-buildsystem/python-cmake-buildsystem
+        tag: bb45aa7a4cfc7a5a93bc490c6158f702d1a2226f
+        dest: dependencies/python.git
+      - type: git
+        url: https://github.com/commontk/qRestAPI
+        tag: ea5e85a1ecfb05174ab604d66fa3186ae9a45eda
+        dest: dependencies/qRestAPI.git
+      - type: git
+        url: https://github.com/miloyip/rapidjson
+        tag: v1.1.0
+        dest: dependencies/RapidJSON.git
+      - type: git
+        url: https://github.com/Slicer/SimpleITK
+        tag: ca0c09386219dfff61975437b7ea32b246adb724
+        dest: dependencies/SimpleITK.git
+      - type: git
+        url: https://github.com/Slicer/SlicerExecutionModel
+        tag: f19d6e88a94ba8f31ddafcff4adf185fe90d7e72
+        dest: dependencies/SlicerExecutionModel.git
+      - type: git
+        url: https://github.com/azadkuh/sqlite-amalgamation
+        tag: 3.30.1
+        dest: dependencies/sqlite.git
+      - type: git
+        url: https://github.com/Slicer/teem
+        tag: e4746083c0e1dc0c137124c41eca5d23adf73bfa
+        dest: dependencies/teem.git
+      - type: git
+        url: https://github.com/slicer/VTK
+        tag: 6efd97c519d0cb813a31e52c232161e73b64a7e8
+        dest: dependencies/VTK.git
+      - type: git
+        url: https://github.com/commontk/zlib
+        tag: 66a753054b356da85e1838a081aa94287226823e
+        dest: dependencies/zlib.git
+      - type: archive
+        url: https://github.com/Slicer/Slicer-OpenSSL/releases/download/sources/openssl-1.1.1g-pr12238.tar.gz
+        sha256: fa621fa4200f5eda4fbd3f3f5c493d4e97020a0d2fce529aad8f4515426311b2
+        dest: dependencies/openssl-1.1.1g-pr12238.tar.gz
+        strip-components: 2
