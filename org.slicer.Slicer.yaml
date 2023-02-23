@@ -42,6 +42,7 @@ modules:
         -DSlicer_zlib_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/zlib.git
         -DSlicer_CTKAPPLAUNCHER_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTKAppLauncher-0.1.31-linux-amd64.tar.gz
         -DSlicer_OpenSSL_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/openssl-1.1.1g-pr12238.tar.gz
+        -DSlicer_python_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/Python-3.9.10.tgz
       - cmake --build Release
     sources:
       - type: git
@@ -55,6 +56,8 @@ modules:
         path: 03-ENH-Make-OpenSSL-sources-visible.patch
       - type: patch
         path: 04-ENH-Make-CTKAppLauncher-sources-available.patch
+      - type: patch
+        path: 05-ENH-Make-Python-sources-available.patch
       - type: git
         url: https://github.com/commontk/bzip2
         tag: 391dddabd24aee4a06e10ab6636f26dd93c21308
@@ -140,4 +143,9 @@ modules:
         url: https://github.com/Slicer/Slicer-OpenSSL/releases/download/sources/openssl-1.1.1g-pr12238.tar.gz
         sha256: fa621fa4200f5eda4fbd3f3f5c493d4e97020a0d2fce529aad8f4515426311b2
         dest: dependencies/openssl-1.1.1g-pr12238.tar.gz
+        strip-components: 2
+      - type: archive
+        url: https://www.python.org/ftp/python/3.9.10/Python-3.9.10.tgz
+        sha256: 1aa9c0702edbae8f6a2c95f70a49da8420aaa76b7889d3419c186bfc8c0e571e
+        dest: dependencies/Python-3.9.10.tgz
         strip-components: 2
