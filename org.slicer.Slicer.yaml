@@ -134,18 +134,18 @@ modules:
         url: https://github.com/commontk/zlib
         tag: 66a753054b356da85e1838a081aa94287226823e
         dest: dependencies/zlib.git
-      - type: archive
+      - type: file
         url: https://github.com/commontk/AppLauncher/releases/download/v0.1.31/CTKAppLauncher-0.1.31-linux-amd64.tar.gz
         sha256: e0da3b495716c58203cc7b68fe5ac13458aa45ac13ac16dec5e7e74e82fd7a0d
-        dest: dependencies/CTKAppLauncher-0.1.31-linux-amd64.tar.gz
-        strip-components: 2
-      - type: archive
+        dest: dependencies
+      - type: file
         url: https://github.com/Slicer/Slicer-OpenSSL/releases/download/sources/openssl-1.1.1g-pr12238.tar.gz
         sha256: fa621fa4200f5eda4fbd3f3f5c493d4e97020a0d2fce529aad8f4515426311b2
-        dest: dependencies/openssl-1.1.1g-pr12238.tar.gz
-        strip-components: 2
-      - type: archive
+        dest: dependencies
+      - type: file
         url: https://www.python.org/ftp/python/3.9.10/Python-3.9.10.tgz
         sha256: 1aa9c0702edbae8f6a2c95f70a49da8420aaa76b7889d3419c186bfc8c0e571e
-        dest: dependencies/Python-3.9.10.tgz
-        strip-components: 2
+        dest: dependencies
+      - type: file
+        url: https://files.pythonhosted.org/packages/bf/27/969c914650fdf0d08b0b92bdbddfc08bea9df6d86aeefd75ba4730f50bc9/setuptools-67.0.0-py3-none-any.whl
+        sha256: 9d790961ba6219e9ff7d9557622d2fe136816a264dd01d5997cfc057d804853d
