@@ -43,6 +43,8 @@ modules:
         -DSlicer_CTKAPPLAUNCHER_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTKAppLauncher-0.1.31-linux-amd64.tar.gz
         -DSlicer_OpenSSL_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/openssl-1.1.1g-pr12238.tar.gz
         -DSlicer_python_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/Python-3.9.10.tgz
+        -DSlicer_python-pip_PYTHON_WHEEL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/pip-23.0.1-py3-none-any.whl
+        -DSlicer_python-setuptools_PYTHON_WHEEL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/setuptools-67.5.1-py3-none-any.whl
       - cmake --build Release
     sources:
       - type: git
@@ -58,6 +60,8 @@ modules:
         path: 04-ENH-Make-CTKAppLauncher-sources-available.patch
       - type: patch
         path: 05-ENH-Make-Python-sources-available.patch
+      - type: patch
+        path: 06-ENH-Enable-install-python-setuptools-from-wheel.patch
       - type: git
         url: https://github.com/commontk/bzip2
         tag: 391dddabd24aee4a06e10ab6636f26dd93c21308
@@ -147,5 +151,12 @@ modules:
         sha256: 1aa9c0702edbae8f6a2c95f70a49da8420aaa76b7889d3419c186bfc8c0e571e
         dest: dependencies
       - type: file
-        url: https://files.pythonhosted.org/packages/bf/27/969c914650fdf0d08b0b92bdbddfc08bea9df6d86aeefd75ba4730f50bc9/setuptools-67.0.0-py3-none-any.whl
-        sha256: 9d790961ba6219e9ff7d9557622d2fe136816a264dd01d5997cfc057d804853d
+        url: https://files.pythonhosted.org/packages/99/02/d6ac140d446e939959e80b7e0c55774fa7a22376847ff5fe191674fd1862/setuptools-67.5.1-py3-none-any.whl
+        sha256: 1c39d42bda4cb89f7fdcad52b6762e3c309ec8f8715b27c684176b7d71283242
+        dest: dependencies
+        dest-filename: setuptools-67.5.1-py3-none-any.whl
+      - type: file
+        url: https://files.pythonhosted.org/packages/07/51/2c0959c5adf988c44d9e1e0d940f5b074516ecc87e96b1af25f59de9ba38/pip-23.0.1-py3-none-any.whl
+        sha256: 236bcb61156d76c4b8a05821b988c7b8c35bf0da28a4b614e8d6ab5212c25c6f
+        dest: dependencies
+        dest-filename: pip-23.0.1-py3-none-any.whl

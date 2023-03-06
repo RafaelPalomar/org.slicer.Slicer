@@ -1,0 +1,52 @@
+diff --git a/SuperBuild/External_python-pip.cmake b/SuperBuild/External_python-pip.cmake
+index a0f20f518a..81230f42f6 100644
+--- a/SuperBuild/External_python-pip.cmake
++++ b/SuperBuild/External_python-pip.cmake
+@@ -31,6 +31,12 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/pip]
+   ]===])
+ 
++if(Slicer_${proj}_PYTHON_WHEEL)
++  set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_PYTHON_WHEEL} -v)
++else()
++  set(Slicer_${proj}_INSTALL_COMMAND "${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}")
++endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -38,7 +44,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
+diff --git a/SuperBuild/External_python-setuptools.cmake b/SuperBuild/External_python-setuptools.cmake
+index 20a6a4656f..d951ec2c77 100644
+--- a/SuperBuild/External_python-setuptools.cmake
++++ b/SuperBuild/External_python-setuptools.cmake
+@@ -30,6 +30,12 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/setuptools]
+   ]===])
+ 
++if(Slicer_${proj}_PYTHON_WHEEL)
++  set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_PYTHON_WHEEL} -v)
++else()
++  set(Slicer_${proj}_INSTALL_COMMAND "${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}")
++endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -37,7 +43,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
