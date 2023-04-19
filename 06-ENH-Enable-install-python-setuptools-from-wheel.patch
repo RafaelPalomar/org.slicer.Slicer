@@ -1,21 +1,284 @@
-diff --git a/SuperBuild/External_python-pip.cmake b/SuperBuild/External_python-pip.cmake
-index a0f20f518a..81230f42f6 100644
---- a/SuperBuild/External_python-pip.cmake
-+++ b/SuperBuild/External_python-pip.cmake
-@@ -31,6 +31,12 @@ if(NOT Slicer_USE_SYSTEM_${proj})
-   # [/pip]
+diff --git a/SuperBuild/External_python-dicom-requirements.cmake b/SuperBuild/External_python-dicom-requirements.cmake
+index 4f88dff880..be51b049fe 100644
+--- a/SuperBuild/External_python-dicom-requirements.cmake
++++ b/SuperBuild/External_python-dicom-requirements.cmake
+@@ -79,6 +79,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/dicomweb-client]
    ]===])
  
-+if(Slicer_${proj}_PYTHON_WHEEL)
-+  set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_PYTHON_WHEEL} -v)
-+else()
-+  set(Slicer_${proj}_INSTALL_COMMAND "${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}")
-+endif()
++  # This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
 +
    ExternalProject_Add(${proj}
      ${${proj}_EP_ARGS}
      DOWNLOAD_COMMAND ""
-@@ -38,7 +44,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -86,7 +102,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
+diff --git a/SuperBuild/External_python-extension-manager-requirements.cmake b/SuperBuild/External_python-extension-manager-requirements.cmake
+index 15cee0f6ee..da3c9d1f7a 100644
+--- a/SuperBuild/External_python-extension-manager-requirements.cmake
++++ b/SuperBuild/External_python-extension-manager-requirements.cmake
+@@ -53,6 +53,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/six]
+   ]===])
+ 
++  # # This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -60,7 +76,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
+diff --git a/SuperBuild/External_python-extension-manager-ssl-requirements.cmake b/SuperBuild/External_python-extension-manager-ssl-requirements.cmake
+index dba7d7194d..9a14ad028f 100644
+--- a/SuperBuild/External_python-extension-manager-ssl-requirements.cmake
++++ b/SuperBuild/External_python-extension-manager-ssl-requirements.cmake
+@@ -99,6 +99,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/PyGithub]
+   ]===])
+ 
++  # This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -106,7 +122,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
+diff --git a/SuperBuild/External_python-numpy.cmake b/SuperBuild/External_python-numpy.cmake
+index c2c6080b8b..d44babe31d 100644
+--- a/SuperBuild/External_python-numpy.cmake
++++ b/SuperBuild/External_python-numpy.cmake
+@@ -47,6 +47,23 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/numpy]
+   ]===])
+ 
++
++  # # This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -54,7 +71,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
+diff --git a/SuperBuild/External_python-pip.cmake b/SuperBuild/External_python-pip.cmake
+index 2e2b2011e1..d8e42fef94 100644
+--- a/SuperBuild/External_python-pip.cmake
++++ b/SuperBuild/External_python-pip.cmake
+@@ -31,6 +31,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/pip]
+   ]===])
+ 
++  # # This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -38,7 +54,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
+diff --git a/SuperBuild/External_python-pythonqt-requirements.cmake b/SuperBuild/External_python-pythonqt-requirements.cmake
+index 884773bd33..a19779365e 100644
+--- a/SuperBuild/External_python-pythonqt-requirements.cmake
++++ b/SuperBuild/External_python-pythonqt-requirements.cmake
+@@ -42,6 +42,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/six]
+   ]===])
+ 
++  # This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -49,7 +65,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
+diff --git a/SuperBuild/External_python-requests-requirements.cmake b/SuperBuild/External_python-requests-requirements.cmake
+index 05deb6200a..922d8d363d 100644
+--- a/SuperBuild/External_python-requests-requirements.cmake
++++ b/SuperBuild/External_python-requests-requirements.cmake
+@@ -61,6 +61,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/requests]
+   ]===])
+ 
++# This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -68,7 +84,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
+diff --git a/SuperBuild/External_python-scipy.cmake b/SuperBuild/External_python-scipy.cmake
+index 40b04b1be6..174370e20b 100644
+--- a/SuperBuild/External_python-scipy.cmake
++++ b/SuperBuild/External_python-scipy.cmake
+@@ -44,6 +44,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/scipy]
+   ]===])
+ 
++  # This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -51,7 +67,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
      BUILD_IN_SOURCE 1
      CONFIGURE_COMMAND ""
      BUILD_COMMAND ""
@@ -25,23 +288,75 @@ index a0f20f518a..81230f42f6 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 diff --git a/SuperBuild/External_python-setuptools.cmake b/SuperBuild/External_python-setuptools.cmake
-index 20a6a4656f..d951ec2c77 100644
+index 661003e5bb..cd78c8f342 100644
 --- a/SuperBuild/External_python-setuptools.cmake
 +++ b/SuperBuild/External_python-setuptools.cmake
-@@ -30,6 +30,12 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -30,6 +30,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
    # [/setuptools]
    ]===])
  
-+if(Slicer_${proj}_PYTHON_WHEEL)
-+  set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_PYTHON_WHEEL} -v)
-+else()
-+  set(Slicer_${proj}_INSTALL_COMMAND "${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}")
-+endif()
++  # # This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
 +
    ExternalProject_Add(${proj}
      ${${proj}_EP_ARGS}
      DOWNLOAD_COMMAND ""
-@@ -37,7 +43,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -37,11 +53,10 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+-    DEPENDS
+-      ${${proj}_DEPENDENCIES}
+-    )
++    DEPENDS ${${proj}_DEPENDENCIES}
++  )
+ 
+   ExternalProject_GenerateProjectDescription_Step(${proj}
+     VERSION ${_version}
+diff --git a/SuperBuild/External_python-wheel.cmake b/SuperBuild/External_python-wheel.cmake
+index bae6337328..07db637ede 100644
+--- a/SuperBuild/External_python-wheel.cmake
++++ b/SuperBuild/External_python-wheel.cmake
+@@ -31,6 +31,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/wheel]
+   ]===])
+ 
++  # This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -38,7 +54,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
      BUILD_IN_SOURCE 1
      CONFIGURE_COMMAND ""
      BUILD_COMMAND ""

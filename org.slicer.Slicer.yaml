@@ -21,30 +21,38 @@ modules:
     buildsystem: simple
     build-commands:
       - cmake -S . -B Release -DCMAKE_BUILD_TYPE:STRING=Release -DSlicer_USE_SYSTEM_LibFFI:BOOL=ON
-        -DSlicer_bzip2_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/bzip2.git
-        -DSlicer_CTKAppLauncherLib_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTKAppLauncherLib.git
         -DSlicer_CTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTK.git
-        -DSlicer_curl_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/curl.git
+        -DSlicer_CTKAppLauncherLib_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTKAppLauncherLib.git
         -DSlicer_DCMTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/DCMTK.git
         -DSlicer_ITK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/ITK.git
         -DSlicer_JsonCpp_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/JsonCpp.git
+        -DSlicer_LZMA_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LZMA.git
         -DSlicer_LibArchive_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LibArchive.git
         -DSlicer_LibFFI_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LibFFI.git
-        -DSlicer_LZMA_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LZMA.git
-        -DSlicer_python_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/python.git
-        -DSlicer_qRestAPI_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/qRestAPI.git
         -DSlicer_RapidJSON_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/RapidJSON.git
         -DSlicer_SimpleITK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/SimpleITK.git
         -DSlicer_SlicerExecutionModel_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/SlicerExecutionModel.git
+        -DSlicer_VTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/VTK.git
+        -DSlicer_bzip2_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/bzip2.git
+        -DSlicer_curl_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/curl.git
+        -DSlicer_python_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/python.git
+        -DSlicer_qRestAPI_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/qRestAPI.git
         -DSlicer_sqlite_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/sqlite.git
         -DSlicer_teem_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/teem.git
-        -DSlicer_VTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/VTK.git
         -DSlicer_zlib_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/zlib.git
         -DSlicer_CTKAPPLAUNCHER_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTKAppLauncher-0.1.31-linux-amd64.tar.gz
         -DSlicer_OpenSSL_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/openssl-1.1.1g-pr12238.tar.gz
         -DSlicer_python_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/Python-3.9.10.tgz
-        -DSlicer_python-pip_PYTHON_WHEEL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/pip-23.0.1-py3-none-any.whl
-        -DSlicer_python-setuptools_PYTHON_WHEEL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/setuptools-67.5.1-py3-none-any.whl
+        -DSlicer_python-dicom-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/
+        -DSlicer_python-extension-manager-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-extension-manager-requirements
+        -DSlicer_python-extension-manager-ssl-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/
+        -DSlicer_python-numpy_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/
+        -DSlicer_python-pip_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-pip
+        -DSlicer_python-pythonqt-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-pythonqt-requirements
+        -DSlicer_python-requests-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-requests-requirements
+        -DSlicer_python-scipy_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/
+        -DSlicer_python-setuptools_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-setuptools
+        -DSlicer_python-wheel_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-wheel
       - cmake --build Release
     sources:
       - type: git
@@ -63,21 +71,13 @@ modules:
       - type: patch
         path: 06-ENH-Enable-install-python-setuptools-from-wheel.patch
       - type: git
-        url: https://github.com/commontk/bzip2
-        tag: 391dddabd24aee4a06e10ab6636f26dd93c21308
-        dest: dependencies/bzip2.git
+        url: https://github.com/commontk/CTK
+        tag: cd194fff1360e2da114b6b55ce963f089c6f46f2
+        dest: dependencies/CTK.git
       - type: git
         url: https://github.com/commontk/AppLauncher
         tag: 8759e03985738b8a8f3eb74ab516ba4e8ef29988
         dest: dependencies/CTKAppLauncherLib.git
-      - type: git
-        url: https://github.com/commontk/CTK
-        tag: 95dac75b80562b81db10555db5807648f4d17dee
-        dest: dependencies/CTK.git
-      - type: git
-        url: https://github.com/Slicer/curl
-        tag: d73e360a78d97adda85364e6bd5c504a2eb1572a
-        dest: dependencies/curl.git
       - type: git
         url: https://github.com/commontk/DCMTK
         tag: 0f9bf4d9e9a778c11fdddafca691b451c2b621bc
@@ -91,6 +91,10 @@ modules:
         tag: 73b8e172d6615251ef851d883ef02f163e7075b2
         dest: dependencies/JsonCpp.git
       - type: git
+        url: https://github.com/xz-mirror/xz
+        tag: v5.2.5
+        dest: dependencies/LZMA.git
+      - type: git
         url: https://github.com/libarchive/libarchive
         tag: 6c3301111caa75c76e1b2acb1afb2d71341932ef
         dest: dependencies/LibArchive.git
@@ -98,18 +102,6 @@ modules:
         url: https://github.com/python-cmake-buildsystem/libffi
         tag: e8599d9d5a50841c11a5ff8e3438dd12f080b096
         dest: dependencies/LibFFI.git
-      - type: git
-        url: https://github.com/xz-mirror/xz
-        tag: v5.2.5
-        dest: dependencies/LZMA.git
-      - type: git
-        url: https://github.com/python-cmake-buildsystem/python-cmake-buildsystem
-        tag: bb45aa7a4cfc7a5a93bc490c6158f702d1a2226f
-        dest: dependencies/python.git
-      - type: git
-        url: https://github.com/commontk/qRestAPI
-        tag: ea5e85a1ecfb05174ab604d66fa3186ae9a45eda
-        dest: dependencies/qRestAPI.git
       - type: git
         url: https://github.com/miloyip/rapidjson
         tag: v1.1.0
@@ -123,6 +115,26 @@ modules:
         tag: f19d6e88a94ba8f31ddafcff4adf185fe90d7e72
         dest: dependencies/SlicerExecutionModel.git
       - type: git
+        url: https://github.com/slicer/VTK
+        tag: 7a000d76cbdafd10f4810e0027a12144a2c6f721
+        dest: dependencies/VTK.git
+      - type: git
+        url: https://github.com/commontk/bzip2
+        tag: 391dddabd24aee4a06e10ab6636f26dd93c21308
+        dest: dependencies/bzip2.git
+      - type: git
+        url: https://github.com/Slicer/curl
+        tag: d73e360a78d97adda85364e6bd5c504a2eb1572a
+        dest: dependencies/curl.git
+      - type: git
+        url: https://github.com/python-cmake-buildsystem/python-cmake-buildsystem
+        tag: bb45aa7a4cfc7a5a93bc490c6158f702d1a2226f
+        dest: dependencies/python.git
+      - type: git
+        url: https://github.com/commontk/qRestAPI
+        tag: ea5e85a1ecfb05174ab604d66fa3186ae9a45eda
+        dest: dependencies/qRestAPI.git
+      - type: git
         url: https://github.com/azadkuh/sqlite-amalgamation
         tag: 3.30.1
         dest: dependencies/sqlite.git
@@ -130,10 +142,6 @@ modules:
         url: https://github.com/Slicer/teem
         tag: e4746083c0e1dc0c137124c41eca5d23adf73bfa
         dest: dependencies/teem.git
-      - type: git
-        url: https://github.com/slicer/VTK
-        tag: 6efd97c519d0cb813a31e52c232161e73b64a7e8
-        dest: dependencies/VTK.git
       - type: git
         url: https://github.com/commontk/zlib
         tag: 66a753054b356da85e1838a081aa94287226823e
@@ -150,13 +158,127 @@ modules:
         url: https://www.python.org/ftp/python/3.9.10/Python-3.9.10.tgz
         sha256: 1aa9c0702edbae8f6a2c95f70a49da8420aaa76b7889d3419c186bfc8c0e571e
         dest: dependencies
-      - type: file
-        url: https://files.pythonhosted.org/packages/99/02/d6ac140d446e939959e80b7e0c55774fa7a22376847ff5fe191674fd1862/setuptools-67.5.1-py3-none-any.whl
-        sha256: 1c39d42bda4cb89f7fdcad52b6762e3c309ec8f8715b27c684176b7d71283242
-        dest: dependencies
-        dest-filename: setuptools-67.5.1-py3-none-any.whl
-      - type: file
-        url: https://files.pythonhosted.org/packages/07/51/2c0959c5adf988c44d9e1e0d940f5b074516ecc87e96b1af25f59de9ba38/pip-23.0.1-py3-none-any.whl
-        sha256: 236bcb61156d76c4b8a05821b988c7b8c35bf0da28a4b614e8d6ab5212c25c6f
-        dest: dependencies
+      # Missing dependencies for /tmp/slicer-flatpak-F8j2ZY30/Slicer/Release/python-dicom-requirements-requirements.txt
+      - dest: dependencies/python-extension-manager-requirements
+        dest-filename: chardet-5.1.0-py3-none-any.whl
+        sha256: 362777fb014af596ad31334fde1e8c327dfdb076e1960d1694662d46a6917ab9
+        type: file
+        url: https://files.pythonhosted.org/packages/74/8f/8fc49109009e8d2169d94d72e6b1f4cd45c13d147ba7d6170fb41f22b08f/chardet-5.1.0-py3-none-any.whl
+      - dest: dependencies/python-extension-manager-requirements
+        dest-filename: CouchDB-1.2-py2.py3-none-any.whl
+        sha256: 13a28a1159c49f8346732e8724b9a4d65cba54bec017c4a7eeb1499fe88151d1
+        type: file
+        url: https://files.pythonhosted.org/packages/ff/35/6660f7526c5d509b13264b27642de73754bd3d0addf56b175601c8b951e1/CouchDB-1.2-py2.py3-none-any.whl
+      - dest: dependencies/python-extension-manager-requirements
+        dest-filename: gitdb-4.0.10-py3-none-any.whl
+        sha256: c286cf298426064079ed96a9e4a9d39e7f3e9bf15ba60701e95f5492f28415c7
+        type: file
+        url: https://files.pythonhosted.org/packages/21/a6/35f83efec687615c711fe0a09b67e58f6d1254db27b1013119de46f450bd/gitdb-4.0.10-py3-none-any.whl
+      - dest: dependencies/python-extension-manager-requirements
+        dest-filename: smmap-5.0.0-py3-none-any.whl
+        sha256: 2aba19d6a040e78d8b09de5c57e96207b09ed71d8e55ce0959eeee6c8e190d94
+        type: file
+        url: https://files.pythonhosted.org/packages/6d/01/7caa71608bc29952ae09b0be63a539e50d2484bc37747797a66a60679856/smmap-5.0.0-py3-none-any.whl
+      - dest: dependencies/python-extension-manager-requirements
+        dest-filename: smmap-5.0.0-py3-none-any.whl
+        sha256: 2aba19d6a040e78d8b09de5c57e96207b09ed71d8e55ce0959eeee6c8e190d94
+        type: file
+        url: https://files.pythonhosted.org/packages/6d/01/7caa71608bc29952ae09b0be63a539e50d2484bc37747797a66a60679856/smmap-5.0.0-py3-none-any.whl
+      - dest: dependencies/python-extension-manager-requirements
+        dest-filename: GitPython-3.1.31-py3-none-any.whl
+        sha256: f04893614f6aa713a60cbbe1e6a97403ef633103cdd0ef5eb6efe0deb98dbe8d
+        type: file
+        url: https://files.pythonhosted.org/packages/9e/8a/d1e02cc111d65b0346f70abb83c51f8593e7134bf694a4a56d1a470caaf7/GitPython-3.1.31-py3-none-any.whl
+      - dest: dependencies/python-extension-manager-requirements
+        dest-filename: gitdb-4.0.10-py3-none-any.whl
+        sha256: c286cf298426064079ed96a9e4a9d39e7f3e9bf15ba60701e95f5492f28415c7
+        type: file
+        url: https://files.pythonhosted.org/packages/21/a6/35f83efec687615c711fe0a09b67e58f6d1254db27b1013119de46f450bd/gitdb-4.0.10-py3-none-any.whl
+      - dest: dependencies/python-extension-manager-requirements
+        dest-filename: smmap-5.0.0-py3-none-any.whl
+        sha256: 2aba19d6a040e78d8b09de5c57e96207b09ed71d8e55ce0959eeee6c8e190d94
+        type: file
+        url: https://files.pythonhosted.org/packages/6d/01/7caa71608bc29952ae09b0be63a539e50d2484bc37747797a66a60679856/smmap-5.0.0-py3-none-any.whl
+      - dest: dependencies/python-extension-manager-requirements
+        dest-filename: six-1.16.0-py2.py3-none-any.whl
+        sha256: 8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
+        type: file
+        url: https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
+      # Missing dependencies for /tmp/slicer-flatpak-F8j2ZY30/Slicer/Release/python-extension-manager-ssl-requirements-requirements.txt
+      # Missing dependencies for /tmp/slicer-flatpak-F8j2ZY30/Slicer/Release/python-numpy-requirements.txt
+      - dest: dependencies/python-pip
         dest-filename: pip-23.0.1-py3-none-any.whl
+        sha256: 236bcb61156d76c4b8a05821b988c7b8c35bf0da28a4b614e8d6ab5212c25c6f
+        type: file
+        url: https://files.pythonhosted.org/packages/07/51/2c0959c5adf988c44d9e1e0d940f5b074516ecc87e96b1af25f59de9ba38/pip-23.0.1-py3-none-any.whl
+      - dest: dependencies/python-pythonqt-requirements
+        dest-filename: packaging-23.0-py3-none-any.whl
+        sha256: 714ac14496c3e68c99c29b00845f7a2b85f3bb6f1078fd9f72fd20f0570002b2
+        type: file
+        url: https://files.pythonhosted.org/packages/ed/35/a31aed2993e398f6b09a790a181a7927eb14610ee8bbf02dc14d31677f1c/packaging-23.0-py3-none-any.whl
+      - dest: dependencies/python-pythonqt-requirements
+        dest-filename: pyparsing-3.0.9-py3-none-any.whl
+        sha256: 5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc
+        type: file
+        url: https://files.pythonhosted.org/packages/6c/10/a7d0fa5baea8fe7b50f448ab742f26f52b80bfca85ac2be9d35cdd9a3246/pyparsing-3.0.9-py3-none-any.whl
+      - dest: dependencies/python-pythonqt-requirements
+        dest-filename: six-1.16.0-py2.py3-none-any.whl
+        sha256: 8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
+        type: file
+        url: https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
+      - dest: dependencies/python-requests-requirements
+        dest-filename: certifi-2022.12.7-py3-none-any.whl
+        sha256: 4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18
+        type: file
+        url: https://files.pythonhosted.org/packages/71/4c/3db2b8021bd6f2f0ceb0e088d6b2d49147671f25832fb17970e9b583d742/certifi-2022.12.7-py3-none-any.whl
+      - dest: dependencies/python-requests-requirements
+        dest-filename: idna-3.4-py3-none-any.whl
+        sha256: 90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
+        type: file
+        url: https://files.pythonhosted.org/packages/fc/34/3030de6f1370931b9dbb4dad48f6ab1015ab1d32447850b9fc94e60097be/idna-3.4-py3-none-any.whl
+      - dest: dependencies/python-requests-requirements
+        dest-filename: charset_normalizer-3.1.0-py3-none-any.whl
+        sha256: 3d9098b479e78c85080c98e1e35ff40b4a31d8953102bb0fd7d1b6f8a2111a3d
+        type: file
+        url: https://files.pythonhosted.org/packages/ef/81/14b3b8f01ddaddad6cdec97f2f599aa2fa466bd5ee9af99b08b7713ccd29/charset_normalizer-3.1.0-py3-none-any.whl
+      - dest: dependencies/python-requests-requirements
+        dest-filename: urllib3-1.26.14-py2.py3-none-any.whl
+        sha256: 75edcdc2f7d85b137124a6c3c9fc3933cdeaa12ecb9a6a959f22797a0feca7e1
+        type: file
+        url: https://files.pythonhosted.org/packages/fe/ca/466766e20b767ddb9b951202542310cba37ea5f2d792dae7589f1741af58/urllib3-1.26.14-py2.py3-none-any.whl
+      - dest: dependencies/python-requests-requirements
+        dest-filename: certifi-2022.12.7-py3-none-any.whl
+        sha256: 4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18
+        type: file
+        url: https://files.pythonhosted.org/packages/71/4c/3db2b8021bd6f2f0ceb0e088d6b2d49147671f25832fb17970e9b583d742/certifi-2022.12.7-py3-none-any.whl
+      - dest: dependencies/python-requests-requirements
+        dest-filename: charset_normalizer-3.1.0-py3-none-any.whl
+        sha256: 3d9098b479e78c85080c98e1e35ff40b4a31d8953102bb0fd7d1b6f8a2111a3d
+        type: file
+        url: https://files.pythonhosted.org/packages/ef/81/14b3b8f01ddaddad6cdec97f2f599aa2fa466bd5ee9af99b08b7713ccd29/charset_normalizer-3.1.0-py3-none-any.whl
+      - dest: dependencies/python-requests-requirements
+        dest-filename: idna-3.4-py3-none-any.whl
+        sha256: 90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
+        type: file
+        url: https://files.pythonhosted.org/packages/fc/34/3030de6f1370931b9dbb4dad48f6ab1015ab1d32447850b9fc94e60097be/idna-3.4-py3-none-any.whl
+      - dest: dependencies/python-requests-requirements
+        dest-filename: requests-2.28.2-py3-none-any.whl
+        sha256: 64299f4909223da747622c030b781c0d7811e359c37124b4bd368fb8c6518baa
+        type: file
+        url: https://files.pythonhosted.org/packages/d2/f4/274d1dbe96b41cf4e0efb70cbced278ffd61b5c7bb70338b62af94ccb25b/requests-2.28.2-py3-none-any.whl
+      - dest: dependencies/python-requests-requirements
+        dest-filename: urllib3-1.26.14-py2.py3-none-any.whl
+        sha256: 75edcdc2f7d85b137124a6c3c9fc3933cdeaa12ecb9a6a959f22797a0feca7e1
+        type: file
+        url: https://files.pythonhosted.org/packages/fe/ca/466766e20b767ddb9b951202542310cba37ea5f2d792dae7589f1741af58/urllib3-1.26.14-py2.py3-none-any.whl
+      # Missing dependencies for /tmp/slicer-flatpak-F8j2ZY30/Slicer/Release/python-scipy-requirements.txt
+      - dest: dependencies/python-setuptools
+        dest-filename: setuptools-67.5.1-py3-none-any.whl
+        sha256: 1c39d42bda4cb89f7fdcad52b6762e3c309ec8f8715b27c684176b7d71283242
+        type: file
+        url: https://files.pythonhosted.org/packages/99/02/d6ac140d446e939959e80b7e0c55774fa7a22376847ff5fe191674fd1862/setuptools-67.5.1-py3-none-any.whl
+      - dest: dependencies/python-wheel
+        dest-filename: wheel-0.38.4-py3-none-any.whl
+        sha256: b60533f3f5d530e971d6737ca6d58681ee434818fab630c83a734bb10c083ce8
+        type: file
+        url: https://files.pythonhosted.org/packages/bd/7c/d38a0b30ce22fc26ed7dbc087c6d00851fb3395e9d0dac40bec1f905030c/wheel-0.38.4-py3-none-any.whl
