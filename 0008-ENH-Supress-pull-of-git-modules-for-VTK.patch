@@ -1,0 +1,25 @@
+From da9fc331db8e201d35bed845ddff4fff3c3c20fa Mon Sep 17 00:00:00 2001
+From: Rafael Palomar <rafael.palomar@ous-research.no>
+Date: Sat, 22 Apr 2023 17:45:54 +0200
+Subject: [PATCH 8/9] ENH: Supress pull of git modules for VTK
+
+---
+ SuperBuild/External_VTK.cmake | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/SuperBuild/External_VTK.cmake b/SuperBuild/External_VTK.cmake
+index 627f50df75..1f3f34f1a0 100644
+--- a/SuperBuild/External_VTK.cmake
++++ b/SuperBuild/External_VTK.cmake
+@@ -158,6 +158,8 @@ if((NOT DEFINED VTK_DIR OR NOT DEFINED VTK_SOURCE_DIR) AND NOT Slicer_USE_SYSTEM
+     ${${proj}_EP_ARGS}
+     GIT_REPOSITORY "${Slicer_${proj}_GIT_REPOSITORY}"
+     GIT_TAG "${Slicer_${proj}_GIT_TAG}"
++    GIT_SUBMODULES_RECURSE 0
++    GIT_SUBMODULES ""
+     SOURCE_DIR ${EP_SOURCE_DIR}
+     BINARY_DIR ${EP_BINARY_DIR}
+     CMAKE_CACHE_ARGS
+-- 
+2.39.2
+

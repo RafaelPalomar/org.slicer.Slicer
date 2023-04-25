@@ -2,10 +2,20 @@ app-id: org.slicer.Slicer
 runtime: org.kde.Platform
 runtime-version: '5.15'
 sdk: org.kde.Sdk
-# KDE runtime environment does not provide the QtWebEngine component
-# required for 3D Slicer
-base: io.qt.qtwebengine.BaseApp
+base: io.qt.qtwebengine.BaseApp # KDE runtime environment does not provide the QtWebEngine component required for 3D Slicer
 base-version: '5.15-22.08'
+build-options:
+  # A more modern approach (according to ChatGPT) that apparently is only available to flatpak-builder >= 1.7.1
+  # ----------------
+  # build-options:
+  #   build-args:
+  #       - --build-arg=libpthread-stubs-devel
+  # ----------------
+  pre-build: |
+      #!/bin/bash
+      # libpthreads are needed for the build process
+      set -e
+      flatpak install -y --user libpthread-stubs-devel
 command: Slicer
 finish-args:
   - |
@@ -20,64 +30,100 @@ modules:
   - name: Slicer
     buildsystem: simple
     build-commands:
-      - cmake -S . -B Release -DCMAKE_BUILD_TYPE:STRING=Release -DSlicer_USE_SYSTEM_LibFFI:BOOL=ON
-        -DSlicer_CTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTK.git
+      - cmake -S . -B Release -DCMAKE_BUILD_TYPE:STRING=Release -DSlicer_USE_SYSTEM_LibFFI:BOOL=ON -DITK_REMOTE_MODULES_DIR:FILEPATH=dependencies/ITK-Remote-Modules -DSlicer_CHECK_CMAKE_HTTPS_SUPPORT:BOOL=OFF
+        -DSlicer_BRAINSTools_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/BRAINSTools.git
+        -DSlicer_bzip2_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/bzip2.git
+        -DSlicer_CompareVolumes_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CompareVolumes.git
         -DSlicer_CTKAppLauncherLib_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTKAppLauncherLib.git
+        -DSlicer_CTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTK.git
+        -DSlicer_curl_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/curl.git
         -DSlicer_DCMTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/DCMTK.git
         -DSlicer_ITK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/ITK.git
         -DSlicer_JsonCpp_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/JsonCpp.git
-        -DSlicer_LZMA_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LZMA.git
+        -DSlicer_LandmarkRegistration_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LandmarkRegistration.git
         -DSlicer_LibArchive_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LibArchive.git
         -DSlicer_LibFFI_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LibFFI.git
-        -DSlicer_RapidJSON_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/RapidJSON.git
-        -DSlicer_SimpleITK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/SimpleITK.git
-        -DSlicer_SlicerExecutionModel_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/SlicerExecutionModel.git
-        -DSlicer_VTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/VTK.git
-        -DSlicer_bzip2_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/bzip2.git
-        -DSlicer_curl_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/curl.git
+        -DSlicer_LZMA_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/LZMA.git
+        -DSlicer_MultiVolumeExplorer_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/MultiVolumeExplorer.git
+        -DSlicer_MultiVolumeImporter_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/MultiVolumeImporter.git
         -DSlicer_python_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/python.git
         -DSlicer_qRestAPI_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/qRestAPI.git
+        -DSlicer_RapidJSON_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/RapidJSON.git
+        -DSlicer_SimpleFilters_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/SimpleFilters.git
+        -DSlicer_SimpleITK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/SimpleITK.git
+        -DSlicer_SlicerExecutionModel_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/SlicerExecutionModel.git
         -DSlicer_sqlite_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/sqlite.git
+        -DSlicer_SurfaceToolbox_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/SurfaceToolbox.git
         -DSlicer_teem_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/teem.git
+        -DSlicer_vtkAddon_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/vtkAddon.git
+        -DSlicer_VTK_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/VTK.git
         -DSlicer_zlib_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/zlib.git
         -DSlicer_CTKAPPLAUNCHER_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTKAppLauncher-0.1.31-linux-amd64.tar.gz
         -DSlicer_OpenSSL_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/openssl-1.1.1g-pr12238.tar.gz
+        -DSlicer_PCRE_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/pcre-8.44.tar.gz
         -DSlicer_python_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/Python-3.9.10.tgz
-        -DSlicer_python-dicom-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/
+        -DSlicer_Swig_ARCHIVE_URL:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/swig-4.0.2.tar.gz
+        -DSlicer_python-dicom-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-dicom-requirements
         -DSlicer_python-extension-manager-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-extension-manager-requirements
-        -DSlicer_python-extension-manager-ssl-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/
-        -DSlicer_python-numpy_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/
+        -DSlicer_python-extension-manager-ssl-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-extension-manager-ssl-requirements
+        -DSlicer_python-numpy_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-numpy
         -DSlicer_python-pip_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-pip
         -DSlicer_python-pythonqt-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-pythonqt-requirements
         -DSlicer_python-requests-requirements_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-requests-requirements
-        -DSlicer_python-scipy_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/
+        -DSlicer_python-scipy_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-scipy
         -DSlicer_python-setuptools_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-setuptools
         -DSlicer_python-wheel_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-wheel
-      - cmake --build Release
+      - cmake --build Release -j1
     sources:
       - type: git
         url: https://github.com/Slicer/Slicer.git
         tag: main
       - type: patch
-        path: 01-ENH-Disable-https-check.patch
+        path: 0001-ENH-Add-an-option-to-switch-CMake-HTTPS-checks.patch
       - type: patch
-        path: 02-ENH-Disable-git-submodules-in-RapidJSON.cmake
+        path: 0002-ENH-Print-external-dependencies-variables.patch
       - type: patch
-        path: 03-ENH-Make-OpenSSL-sources-visible.patch
+        path: 0003-ENH-Expose-CTKAPPLAUNCHER-sources-variables.patch
       - type: patch
-        path: 04-ENH-Make-CTKAppLauncher-sources-available.patch
+        path: 0004-ENH-Disable-pull-of-git-submodules-for-RapidJSON.patch
       - type: patch
-        path: 05-ENH-Make-Python-sources-available.patch
+        path: 0005-ENH-Expose-OpenSSL-dependencies-variables.patch
       - type: patch
-        path: 06-ENH-Enable-install-python-setuptools-from-wheel.patch
+        path: 0006-ENH-Expose-python-dependency-variables.patch
+      - type: patch
+        path: 0007-ENH-Expose-python-wheel-dependencies.patch
+      - type: patch
+        path: 0008-ENH-Supress-pull-of-git-modules-for-VTK.patch
+      - type: patch
+        path: 0009-ENH-Enable-ITK-build-with-offline-remote-modules.patch
+      - type: patch
+        path: 0010-ENH-Enable-offline-remote-dependencies.patch
+      - type: patch
+        path: 0011-ENH-Enable-offline-PCRE-build.patch
+      - type: git
+        url: https://github.com/BRAINSia/BRAINSTools
+        tag: 37b0a0f64cbff2b987fee321c9363554cee52b14
+        dest: dependencies/BRAINSTools.git
+      - type: git
+        url: https://github.com/commontk/bzip2
+        tag: 391dddabd24aee4a06e10ab6636f26dd93c21308
+        dest: dependencies/bzip2.git
+      - type: git
+        url: https://github.com/pieper/CompareVolumes
+        tag: 7e5530930282a5f99c746df331538e431f3609b4
+        dest: dependencies/CompareVolumes.git
+      - type: git
+        url: https://github.com/commontk/AppLauncher
+        tag: 8759e03985738b8a8f3eb74ab516ba4e8ef29988
+        dest: dependencies/CTKAppLauncherLib.git
       - type: git
         url: https://github.com/commontk/CTK
         tag: cd194fff1360e2da114b6b55ce963f089c6f46f2
         dest: dependencies/CTK.git
       - type: git
-        url: https://github.com/commontk/AppLauncher
-        tag: 8759e03985738b8a8f3eb74ab516ba4e8ef29988
-        dest: dependencies/CTKAppLauncherLib.git
+        url: https://github.com/Slicer/curl
+        tag: d73e360a78d97adda85364e6bd5c504a2eb1572a
+        dest: dependencies/curl.git
       - type: git
         url: https://github.com/commontk/DCMTK
         tag: 0f9bf4d9e9a778c11fdddafca691b451c2b621bc
@@ -91,9 +137,9 @@ modules:
         tag: 73b8e172d6615251ef851d883ef02f163e7075b2
         dest: dependencies/JsonCpp.git
       - type: git
-        url: https://github.com/xz-mirror/xz
-        tag: v5.2.5
-        dest: dependencies/LZMA.git
+        url: https://github.com/Slicer/LandmarkRegistration
+        tag: 551cee5c26266c5afaa44883e014e978cb0e9646
+        dest: dependencies/LandmarkRegistration.git
       - type: git
         url: https://github.com/libarchive/libarchive
         tag: 6c3301111caa75c76e1b2acb1afb2d71341932ef
@@ -103,29 +149,17 @@ modules:
         tag: e8599d9d5a50841c11a5ff8e3438dd12f080b096
         dest: dependencies/LibFFI.git
       - type: git
-        url: https://github.com/miloyip/rapidjson
-        tag: v1.1.0
-        dest: dependencies/RapidJSON.git
+        url: https://github.com/xz-mirror/xz
+        tag: v5.2.5
+        dest: dependencies/LZMA.git
       - type: git
-        url: https://github.com/Slicer/SimpleITK
-        tag: ca0c09386219dfff61975437b7ea32b246adb724
-        dest: dependencies/SimpleITK.git
+        url: https://github.com/fedorov/MultiVolumeExplorer
+        tag: 36102fd0ffae409319c0a0fee71dde1df64fe9e0
+        dest: dependencies/MultiVolumeExplorer.git
       - type: git
-        url: https://github.com/Slicer/SlicerExecutionModel
-        tag: f19d6e88a94ba8f31ddafcff4adf185fe90d7e72
-        dest: dependencies/SlicerExecutionModel.git
-      - type: git
-        url: https://github.com/slicer/VTK
-        tag: 7a000d76cbdafd10f4810e0027a12144a2c6f721
-        dest: dependencies/VTK.git
-      - type: git
-        url: https://github.com/commontk/bzip2
-        tag: 391dddabd24aee4a06e10ab6636f26dd93c21308
-        dest: dependencies/bzip2.git
-      - type: git
-        url: https://github.com/Slicer/curl
-        tag: d73e360a78d97adda85364e6bd5c504a2eb1572a
-        dest: dependencies/curl.git
+        url: https://github.com/fedorov/MultiVolumeImporter
+        tag: c14758931e009419dd95963219e904e5b7d70bbf
+        dest: dependencies/MultiVolumeImporter.git
       - type: git
         url: https://github.com/python-cmake-buildsystem/python-cmake-buildsystem
         tag: bb45aa7a4cfc7a5a93bc490c6158f702d1a2226f
@@ -135,13 +169,41 @@ modules:
         tag: ea5e85a1ecfb05174ab604d66fa3186ae9a45eda
         dest: dependencies/qRestAPI.git
       - type: git
+        url: https://github.com/miloyip/rapidjson
+        tag: v1.1.0
+        dest: dependencies/RapidJSON.git
+      - type: git
+        url: https://github.com/SimpleITK/SlicerSimpleFilters
+        tag: 92e8db0030f6f9d9ea99dd5d8d1425b6b2189a68
+        dest: dependencies/SimpleFilters.git
+      - type: git
+        url: https://github.com/Slicer/SimpleITK
+        tag: ca0c09386219dfff61975437b7ea32b246adb724
+        dest: dependencies/SimpleITK.git
+      - type: git
+        url: https://github.com/Slicer/SlicerExecutionModel
+        tag: f19d6e88a94ba8f31ddafcff4adf185fe90d7e72
+        dest: dependencies/SlicerExecutionModel.git
+      - type: git
         url: https://github.com/azadkuh/sqlite-amalgamation
         tag: 3.30.1
         dest: dependencies/sqlite.git
       - type: git
+        url: https://github.com/Slicer/SlicerSurfaceToolbox
+        tag: 3b556d10307c5c9ee9fd8da1ea873ddc1d48acf3
+        dest: dependencies/SurfaceToolbox.git
+      - type: git
         url: https://github.com/Slicer/teem
         tag: e4746083c0e1dc0c137124c41eca5d23adf73bfa
         dest: dependencies/teem.git
+      - type: git
+        url: https://github.com/Slicer/vtkAddon
+        tag: 4413fde380b744ab221f7beb4410e11a5158b496
+        dest: dependencies/vtkAddon.git
+      - type: git
+        url: https://github.com/slicer/VTK
+        tag: 7a000d76cbdafd10f4810e0027a12144a2c6f721
+        dest: dependencies/VTK.git
       - type: git
         url: https://github.com/commontk/zlib
         tag: 66a753054b356da85e1838a081aa94287226823e
@@ -155,10 +217,291 @@ modules:
         sha256: fa621fa4200f5eda4fbd3f3f5c493d4e97020a0d2fce529aad8f4515426311b2
         dest: dependencies
       - type: file
+        url: https://github.com/Slicer/SlicerBinaryDependencies/releases/download/PCRE/pcre-8.44.tar.gz
+        sha256: aecafd4af3bd0f3935721af77b889d9024b2e01d96b58471bd91a3063fb47728
+        dest: dependencies
+      - type: file
         url: https://www.python.org/ftp/python/3.9.10/Python-3.9.10.tgz
         sha256: 1aa9c0702edbae8f6a2c95f70a49da8420aaa76b7889d3419c186bfc8c0e571e
         dest: dependencies
-      # Missing dependencies for /tmp/slicer-flatpak-F8j2ZY30/Slicer/Release/python-dicom-requirements-requirements.txt
+      - type: file
+        url: https://github.com/Slicer/SlicerBinaryDependencies/releases/download/swig/swig-4.0.2.tar.gz
+        sha256: d53be9730d8d58a16bf0cbd1f8ac0c0c3e1090573168bfa151b01eb47fa906fc
+        dest: dependencies
+      - type: git
+        url: https://github.com/ntustison/ITKAdaptiveDenoising.git
+        tag:   24825c8d246e941334f47968553f0ae388851f0c
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-AdaptiveDenoising.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/itkAnalyzeObjectMap.git
+        tag:   e6a8291f6066c4f0e732d422c3cdb0a5644f2ce6
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-AnalyzeObjectLabelMap.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKAnisotropicDiffusionLBR.git
+        tag:   d46aab0e0c8f02b89eaa0420e61970559177683f
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-AnisotropicDiffusionLBR.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKBioCell.git
+        tag:   5a6ee6c0cef727d8a6c39b3333af0fced0611dee
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-BioCell.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKBoneEnhancement.git
+        tag:   658b9cb31f7216f604dfd35b187bd1ae80fd7506
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-BoneEnhancement.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKBoneMorphometry.git
+        tag:   e68bd5b9274d448f0888acef5abf5ccdeb27b3b8
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-BoneMorphometry.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKBSplineGradient.git
+        tag:   f5d1205837509e962afe853ec3e31e25bfb0feab
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-BSplineGradient.remote.git
+      - type: git
+        url: https://github.com/SCIInstitute/ITKCleaver.git
+        tag:   a12f62a7f7f5329525f1ab0b22823bb8aa8a2df0
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-Cleaver.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKCuberille.git
+        tag:   3e049175b5a8a60015451b9c34198cb410f17004
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-Cuberille.remote.git
+      - type: git
+        url: https://github.com/SimonRit/ITKCudaCommon.git
+        tag:   4745a97e07496e214c1ee10ec278dcae56b010b4
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-CudaCommon.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKFixedPointInverseDisplacementField.git
+        tag:   e38e8a3c5af0ffc6ee208e44b805b817d9836ab2
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-FixedPointInverseDisplacementField.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKGenericLabelInterpolator.git
+        tag:   2f3768110ffe160c00c533a1450a49a16f4452d9
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-GenericLabelInterpolator.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKGrowCut.git
+        tag:   21d982afd15047173108d39643adfba3ba7ca0a9
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-GrowCut.remote.git
+      - type: git
+        url: https://github.com/KitwareMedical/HASI.git
+        tag:   35e0a2bb13c4febf360282aa1fc1fd8f13305af0
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-HASI.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKHigherOrderAccurateGradient.git
+        tag:   0a40f5c99ca21ef4b9cbf2b47b1be149046905e6
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-HigherOrderAccurateGradient.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKIOFDF.git
+        tag:   79695870f4d2416b257db733624a3e8bfc38391d
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-IOFDF.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKIOMeshSTL.git
+        tag:   764773647490f2c8da48b5bea2ad4ea91c911915
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-IOMeshSTL.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKIOMeshSWC.git
+        tag:   212b3678780b5b6ab27ae17ea68072ec5a088156
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-IOMeshSWC.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKIOOpenSlide.git
+        tag:   fb654552e240e50bd4121d431d88536d2c84e937
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-IOOpenSlide.remote.git
+      - type: git
+        url: https://github.com/KitwareMedical/ITKIOScanco.git
+        tag:   ed97d302e67571d95eea1a49cebad4a4d31399fd
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-IOScanco.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKIOTransformDCMTK.git
+        tag:   e97e0e8c27809eea1834dd534a47fc06168e3e45
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-IOTransformDCMTK.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKIsotropicWavelets.git
+        tag:   b63d8d55f146d194b665e3599d5a154054d052e9
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-IsotropicWavelets.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKLabelErodeDilate.git
+        tag:   af2525c2f2d45d43989dfcdd9b9587a0f9c8a03e
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-LabelErodeDilate.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/LesionSizingToolkit.git
+        tag:   58b95e8f54e8f270b2b221c519f7a49c2086bb11
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-LesionSizingToolkit.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKMeshNoise.git
+        tag:   a01fae4f1d637eb6d4a183d940b9ce79970db14e
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-MeshNoise.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKMeshToPolyData.git
+        tag:   f2140a34bec87aecae2f64937d4c1172d4c1763d
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-MeshToPolyData.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/itkMGHImageIO.git
+        tag:   4b2e7bd514d3759b6903b75c71d593d061b6e6a3
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-MGHIO.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKMinimalPathExtraction.git
+        tag:   b83fdc9d726552e0d4b5044c5ad593c29fb76f1a
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-MinimalPathExtraction.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKMontage.git
+        tag:   21f8eb99ae350f4c0d271da149fea2adeda7d6e1
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-Montage.remote.git
+      - type: git
+        url: https://github.com/KitwareMedical/ITKMorphologicalContourInterpolation.git
+        tag:   dbe1d9e53a2b9ed595cdda530cb7e863c1b95c20
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-MorphologicalContourInterpolation.remote.git
+      - type: git
+        url: https://github.com/KitwareMedical/MultipleImageIterator.git
+        tag:   046e70f43f56ac1a0e32e083fb1fe1d1379a1f73
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-MultipleImageIterator.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKParabolicMorphology.git
+        tag:   2c6aa18ff5415b320bf9d85dae6b1cf68c099d55
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-ParabolicMorphology.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKPerformanceBenchmarking.git
+        tag:   950921a642a720867c00c92c548312a4939da917
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-PerformanceBenchmarking.remote.git
+      - type: git
+        url: https://github.com/KitwareMedical/ITKPhaseSymmetry.git
+        tag:   4d9cba2d0529e29500c11fd25ac9c4c808a0279b
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-PhaseSymmetry.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKPolarTransform.git
+        tag:   930d44ac91d2994e4d604be67714f1ffb9cd065c
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-PolarTransform.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKPrincipalComponentsAnalysis.git
+        tag:   2f8d8bffb37fca8875a674465af5e3d902432f30
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-PrincipalComponentsAnalysis.remote.git
+      - type: git
+        url: https://github.com/KitwareMedical/ITKRLEImage.git
+        tag:   0c7971981a38bc3191f8e36ccee1fe483d9dd2e3
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-RLEImage.remote.git
+      - type: git
+        url: https://github.com/SimonRit/RTK.git
+        tag:   cd65ca6079dc3f55e00b75adbbb868779dca0005
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-RTK.remote.git
+      - type: git
+        url: https://github.com/scifio/scifio-imageio.git
+        tag:   1054ece893ee072bdb8124c45ce207de00af280f
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-SCIFIO.remote.git
+      - type: git
+        url: https://github.com/SlicerSALT/ITKShape.git
+        tag:   67373b34a20116698b4d3617dc5c2edf9be6e2cc
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-Shape.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKSimpleITKFilters.git
+        tag:   877b9be442e36b9dee9d9e251bb1107acc6eed56
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-SimpleITKFilters.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKSkullStrip.git
+        tag:   da5821af3e2fe8f4c2d881d4fd961b17d0684b3e
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-SkullStrip.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKSmoothingRecursiveYvvGaussianFilter.git
+        tag:   f6bd553266aa1c1c3cdebc9033fd3b21f1f734c4
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-SmoothingRecursiveYvvGaussianFilter.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKSphinxExamples.git
+        tag:   ffdabca2f41e91a062b6b616f300f55ef088eddc
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-SphinxExamples.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKSplitComponents.git
+        tag:   697e9552f6d4d6c56e7ef4c767b020973d902539
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-SplitComponents.remote.git
+      - type: git
+        url: https://github.com/KitwareMedical/ITKStrain.git
+        tag:   0e2f894e70243d46a4bab40a533a491a23a0f796
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-Strain.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/itkSubdivisionQuadEdgeMeshFilter
+        tag:   6e30c49f7ef9a5b4854bff39834f9d7e181130aa
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-SubdivisionQuadEdgeMeshFilter.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKTextureFeatures.git
+        tag:   b75d9daf50b16da0cec92a6f620426122489bd38
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-TextureFeatures.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKThickness3D.git
+        tag:   cc8c9602cb7a7538bfd9f55515d9ab4cf0b04cdd
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-Thickness3D.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKTotalVariation.git
+        tag:   1dda823f15c8e190ddcd9354f388af01f8b07b08
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-TotalVariation.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKTubeTK.git
+        tag:   v1.3.3
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-TubeTK.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKTwoProjectionRegistration.git
+        tag:   2cf7d9522031c613a3edcdcd76aee2896536672e
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-TwoProjectionRegistration.remote.git
+      - type: git
+        url: https://github.com/KitwareMedical/ITKUltrasound.git
+        tag:   6f126b84d9a6511c695c197330800c5612fced93
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-Ultrasound.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKVariationalRegistration.git
+        tag:   7634013fa2b661eda81d79e52b804f669ec0ce79
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-VariationalRegistration.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/ITKVkFFTBackend.git
+        tag:   f5e0a5f93bf9c88698d95ef2cb24f086bd4e1334
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-VkFFTBackend.remote.git
+      - type: git
+        url: https://github.com/InsightSoftwareConsortium/itk-wasm.git
+        tag:   80f0354caf375e26549864c5155b0484b59b8f05
+        dest: dependencies/ITK-Remote-Modules/ITK-Remote-WebAssemblyInterface.remote.git
+      - dest: dependencies/python-dicom-requirements
+        dest-filename: pydicom-2.3.1-py3-none-any.whl
+        sha256: b00bacdabc1f8a18b61a08bb6cd0f41c419446531638c895a708c22a35d69cfe
+        type: file
+        url: https://files.pythonhosted.org/packages/bc/72/8342fdbd09a169c8552d1df40b3679776c45cabb47c667022afae50aecd4/pydicom-2.3.1-py3-none-any.whl
+      - dest: dependencies/python-dicom-requirements
+        dest-filename: six-1.16.0-py2.py3-none-any.whl
+        sha256: 8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
+        type: file
+        url: https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
+      - dest: dependencies/python-dicom-requirements
+        dest-filename: Pillow-9.4.0.tar.gz
+        sha256: a1c2d7780448eb93fbcc3789bf3916aa5720d942e37945f4056680317f1cd23e
+        type: file
+        url: https://files.pythonhosted.org/packages/bc/07/830784e061fb94d67649f3e438ff63cfb902dec6d48ac75aeaaac7c7c30e/Pillow-9.4.0.tar.gz
+      - dest: dependencies/python-dicom-requirements
+        dest-filename: retrying-1.3.4-py3-none-any.whl
+        sha256: 8cc4d43cb8e1125e0ff3344e9de678fefd85db3b750b81b2240dc0183af37b35
+        type: file
+        url: https://files.pythonhosted.org/packages/8f/04/9e36f28be4c0532c0e9207ff9dc01fb13a2b0eb036476a213b0000837d0e/retrying-1.3.4-py3-none-any.whl
+      - dest: dependencies/python-dicom-requirements
+        dest-filename: six-1.16.0-py2.py3-none-any.whl
+        sha256: 8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
+        type: file
+        url: https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
+      - dest: dependencies/python-dicom-requirements
+        dest-filename: Pillow-9.4.0.tar.gz
+        sha256: a1c2d7780448eb93fbcc3789bf3916aa5720d942e37945f4056680317f1cd23e
+        type: file
+        url: https://files.pythonhosted.org/packages/bc/07/830784e061fb94d67649f3e438ff63cfb902dec6d48ac75aeaaac7c7c30e/Pillow-9.4.0.tar.gz
+      - dest: dependencies/python-dicom-requirements
+        dest-filename: dicomweb_client-0.59.1-py3-none-any.whl
+        sha256: ad4af95e1bdeb3691841cf8b28894fc6d9ba7ac5b7892bff70a506eedbd20d79
+        type: file
+        url: https://files.pythonhosted.org/packages/e2/c4/7d175d42360052bdddabef3c11a10d54031314c1e5abc5711681c6cd2838/dicomweb_client-0.59.1-py3-none-any.whl
+      - dest: dependencies/python-dicom-requirements
+        dest-filename: pydicom-2.3.1-py3-none-any.whl
+        sha256: b00bacdabc1f8a18b61a08bb6cd0f41c419446531638c895a708c22a35d69cfe
+        type: file
+        url: https://files.pythonhosted.org/packages/bc/72/8342fdbd09a169c8552d1df40b3679776c45cabb47c667022afae50aecd4/pydicom-2.3.1-py3-none-any.whl
+      - dest: dependencies/python-dicom-requirements
+        dest-filename: retrying-1.3.4-py3-none-any.whl
+        sha256: 8cc4d43cb8e1125e0ff3344e9de678fefd85db3b750b81b2240dc0183af37b35
+        type: file
+        url: https://files.pythonhosted.org/packages/8f/04/9e36f28be4c0532c0e9207ff9dc01fb13a2b0eb036476a213b0000837d0e/retrying-1.3.4-py3-none-any.whl
+      - dest: dependencies/python-dicom-requirements
+        dest-filename: six-1.16.0-py2.py3-none-any.whl
+        sha256: 8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
+        type: file
+        url: https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
       - dest: dependencies/python-extension-manager-requirements
         dest-filename: chardet-5.1.0-py3-none-any.whl
         sha256: 362777fb014af596ad31334fde1e8c327dfdb076e1960d1694662d46a6917ab9
@@ -204,8 +547,101 @@ modules:
         sha256: 8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
         type: file
         url: https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
-      # Missing dependencies for /tmp/slicer-flatpak-F8j2ZY30/Slicer/Release/python-extension-manager-ssl-requirements-requirements.txt
-      # Missing dependencies for /tmp/slicer-flatpak-F8j2ZY30/Slicer/Release/python-numpy-requirements.txt
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: PyJWT-2.6.0-py3-none-any.whl
+        sha256: d83c3d892a77bbb74d3e1a2cfa90afaadb60945205d1095d9221f04466f64c14
+        type: file
+        url: https://files.pythonhosted.org/packages/40/46/505f0dd53c14096f01922bf93a7abb4e40e29a06f858abbaa791e6954324/PyJWT-2.6.0-py3-none-any.whl
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: wrapt-1.15.0.tar.gz
+        sha256: d06730c6aed78cee4126234cf2d071e01b44b915e725a6cb439a879ec9754a3a
+        type: file
+        url: https://files.pythonhosted.org/packages/f8/7d/73e4e3cdb2c780e13f9d87dc10488d7566d8fd77f8d68f0e416bfbd144c7/wrapt-1.15.0.tar.gz
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: Deprecated-1.2.13-py2.py3-none-any.whl
+        sha256: 64756e3e14c8c5eea9795d93c524551432a0be75629f8f29e67ab8caf076c76d
+        type: file
+        url: https://files.pythonhosted.org/packages/51/6a/c3a0408646408f7283b7bc550c30a32cc791181ec4618592eec13e066ce3/Deprecated-1.2.13-py2.py3-none-any.whl
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: wrapt-1.15.0.tar.gz
+        sha256: d06730c6aed78cee4126234cf2d071e01b44b915e725a6cb439a879ec9754a3a
+        type: file
+        url: https://files.pythonhosted.org/packages/f8/7d/73e4e3cdb2c780e13f9d87dc10488d7566d8fd77f8d68f0e416bfbd144c7/wrapt-1.15.0.tar.gz
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: pycparser-2.21-py2.py3-none-any.whl
+        sha256: 8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9
+        type: file
+        url: https://files.pythonhosted.org/packages/62/d5/5f610ebe421e85889f2e55e33b7f9a6795bd982198517d912eb1c76e1a53/pycparser-2.21-py2.py3-none-any.whl
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: cffi-1.15.1.tar.gz
+        sha256: d400bfb9a37b1351253cb402671cea7e89bdecc294e8016a707f6d1d8ac934f9
+        type: file
+        url: https://files.pythonhosted.org/packages/2b/a8/050ab4f0c3d4c1b8aaa805f70e26e84d0e27004907c5b8ecc1d31815f92a/cffi-1.15.1.tar.gz
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: pycparser-2.21-py2.py3-none-any.whl
+        sha256: 8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9
+        type: file
+        url: https://files.pythonhosted.org/packages/62/d5/5f610ebe421e85889f2e55e33b7f9a6795bd982198517d912eb1c76e1a53/pycparser-2.21-py2.py3-none-any.whl
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: PyNaCl-1.5.0.tar.gz
+        sha256: 8ac7448f09ab85811607bdd21ec2464495ac8b7c66d146bf545b0f08fb9220ba
+        type: file
+        url: https://files.pythonhosted.org/packages/a7/22/27582568be639dfe22ddb3902225f91f2f17ceff88ce80e4db396c8986da/PyNaCl-1.5.0.tar.gz
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: cffi-1.15.1.tar.gz
+        sha256: d400bfb9a37b1351253cb402671cea7e89bdecc294e8016a707f6d1d8ac934f9
+        type: file
+        url: https://files.pythonhosted.org/packages/2b/a8/050ab4f0c3d4c1b8aaa805f70e26e84d0e27004907c5b8ecc1d31815f92a/cffi-1.15.1.tar.gz
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: pycparser-2.21-py2.py3-none-any.whl
+        sha256: 8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9
+        type: file
+        url: https://files.pythonhosted.org/packages/62/d5/5f610ebe421e85889f2e55e33b7f9a6795bd982198517d912eb1c76e1a53/pycparser-2.21-py2.py3-none-any.whl
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: Deprecated-1.2.13-py2.py3-none-any.whl
+        sha256: 64756e3e14c8c5eea9795d93c524551432a0be75629f8f29e67ab8caf076c76d
+        type: file
+        url: https://files.pythonhosted.org/packages/51/6a/c3a0408646408f7283b7bc550c30a32cc791181ec4618592eec13e066ce3/Deprecated-1.2.13-py2.py3-none-any.whl
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: PyGithub-1.58.0-py3-none-any.whl
+        sha256: b7bac601492a2b6c876ef326e4ffa3c1923e32707e415da76bfb8307ee8ffb7e
+        type: file
+        url: https://files.pythonhosted.org/packages/d0/de/2c9ab7a1ae4684b7e8dc79794100380ef1509519ead6e06ab3534fe09ace/PyGithub-1.58.0-py3-none-any.whl
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: PyJWT-2.6.0-py3-none-any.whl
+        sha256: d83c3d892a77bbb74d3e1a2cfa90afaadb60945205d1095d9221f04466f64c14
+        type: file
+        url: https://files.pythonhosted.org/packages/40/46/505f0dd53c14096f01922bf93a7abb4e40e29a06f858abbaa791e6954324/PyJWT-2.6.0-py3-none-any.whl
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: PyNaCl-1.5.0.tar.gz
+        sha256: 8ac7448f09ab85811607bdd21ec2464495ac8b7c66d146bf545b0f08fb9220ba
+        type: file
+        url: https://files.pythonhosted.org/packages/a7/22/27582568be639dfe22ddb3902225f91f2f17ceff88ce80e4db396c8986da/PyNaCl-1.5.0.tar.gz
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: cffi-1.15.1.tar.gz
+        sha256: d400bfb9a37b1351253cb402671cea7e89bdecc294e8016a707f6d1d8ac934f9
+        type: file
+        url: https://files.pythonhosted.org/packages/2b/a8/050ab4f0c3d4c1b8aaa805f70e26e84d0e27004907c5b8ecc1d31815f92a/cffi-1.15.1.tar.gz
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: pycparser-2.21-py2.py3-none-any.whl
+        sha256: 8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9
+        type: file
+        url: https://files.pythonhosted.org/packages/62/d5/5f610ebe421e85889f2e55e33b7f9a6795bd982198517d912eb1c76e1a53/pycparser-2.21-py2.py3-none-any.whl
+      - dest: dependencies/python-extension-manager-ssl-requirements
+        dest-filename: wrapt-1.15.0.tar.gz
+        sha256: d06730c6aed78cee4126234cf2d071e01b44b915e725a6cb439a879ec9754a3a
+        type: file
+        url: https://files.pythonhosted.org/packages/f8/7d/73e4e3cdb2c780e13f9d87dc10488d7566d8fd77f8d68f0e416bfbd144c7/wrapt-1.15.0.tar.gz
+      - dest: dependencies/python-numpy
+        dest-filename: nose-1.3.7-py3-none-any.whl
+        sha256: 9ff7c6cc443f8c51994b34a667bbcf45afd6d945be7477b52e97516fd17c53ac
+        type: file
+        url: https://files.pythonhosted.org/packages/15/d8/dd071918c040f50fa1cf80da16423af51ff8ce4a0f2399b7bf8de45ac3d9/nose-1.3.7-py3-none-any.whl
+      - dest: dependencies/python-numpy
+        dest-filename: numpy-1.24.2.tar.gz
+        sha256: 003a9f530e880cb2cd177cba1af7220b9aa42def9c4afc2a2fc3ee6be7eb2b22
+        type: file
+        url: https://files.pythonhosted.org/packages/e4/a9/6704bb5e1d1d778d3a6ee1278a8d8134f0db160e09d52863a24edb58eab5/numpy-1.24.2.tar.gz
       - dest: dependencies/python-pip
         dest-filename: pip-23.0.1-py3-none-any.whl
         sha256: 236bcb61156d76c4b8a05821b988c7b8c35bf0da28a4b614e8d6ab5212c25c6f
@@ -237,10 +673,10 @@ modules:
         type: file
         url: https://files.pythonhosted.org/packages/fc/34/3030de6f1370931b9dbb4dad48f6ab1015ab1d32447850b9fc94e60097be/idna-3.4-py3-none-any.whl
       - dest: dependencies/python-requests-requirements
-        dest-filename: charset_normalizer-3.1.0-py3-none-any.whl
-        sha256: 3d9098b479e78c85080c98e1e35ff40b4a31d8953102bb0fd7d1b6f8a2111a3d
+        dest-filename: charset-normalizer-3.1.0.tar.gz
+        sha256: 34e0a2f9c370eb95597aae63bf85eb5e96826d81e3dcf88b8886012906f509b5
         type: file
-        url: https://files.pythonhosted.org/packages/ef/81/14b3b8f01ddaddad6cdec97f2f599aa2fa466bd5ee9af99b08b7713ccd29/charset_normalizer-3.1.0-py3-none-any.whl
+        url: https://files.pythonhosted.org/packages/ff/d7/8d757f8bd45be079d76309248845a04f09619a7b17d6dfc8c9ff6433cac2/charset-normalizer-3.1.0.tar.gz
       - dest: dependencies/python-requests-requirements
         dest-filename: urllib3-1.26.14-py2.py3-none-any.whl
         sha256: 75edcdc2f7d85b137124a6c3c9fc3933cdeaa12ecb9a6a959f22797a0feca7e1
@@ -252,10 +688,10 @@ modules:
         type: file
         url: https://files.pythonhosted.org/packages/71/4c/3db2b8021bd6f2f0ceb0e088d6b2d49147671f25832fb17970e9b583d742/certifi-2022.12.7-py3-none-any.whl
       - dest: dependencies/python-requests-requirements
-        dest-filename: charset_normalizer-3.1.0-py3-none-any.whl
-        sha256: 3d9098b479e78c85080c98e1e35ff40b4a31d8953102bb0fd7d1b6f8a2111a3d
+        dest-filename: charset-normalizer-3.1.0.tar.gz
+        sha256: 34e0a2f9c370eb95597aae63bf85eb5e96826d81e3dcf88b8886012906f509b5
         type: file
-        url: https://files.pythonhosted.org/packages/ef/81/14b3b8f01ddaddad6cdec97f2f599aa2fa466bd5ee9af99b08b7713ccd29/charset_normalizer-3.1.0-py3-none-any.whl
+        url: https://files.pythonhosted.org/packages/ff/d7/8d757f8bd45be079d76309248845a04f09619a7b17d6dfc8c9ff6433cac2/charset-normalizer-3.1.0.tar.gz
       - dest: dependencies/python-requests-requirements
         dest-filename: idna-3.4-py3-none-any.whl
         sha256: 90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
@@ -271,7 +707,11 @@ modules:
         sha256: 75edcdc2f7d85b137124a6c3c9fc3933cdeaa12ecb9a6a959f22797a0feca7e1
         type: file
         url: https://files.pythonhosted.org/packages/fe/ca/466766e20b767ddb9b951202542310cba37ea5f2d792dae7589f1741af58/urllib3-1.26.14-py2.py3-none-any.whl
-      # Missing dependencies for /tmp/slicer-flatpak-F8j2ZY30/Slicer/Release/python-scipy-requirements.txt
+      - dest: dependencies/python-scipy
+        dest-filename: scipy-1.10.1.tar.gz
+        sha256: 2cf9dfb80a7b4589ba4c40ce7588986d6d5cebc5457cad2c2880f6bc2d42f3a5
+        type: file
+        url: https://files.pythonhosted.org/packages/84/a9/2bf119f3f9cff1f376f924e39cfae18dec92a1514784046d185731301281/scipy-1.10.1.tar.gz
       - dest: dependencies/python-setuptools
         dest-filename: setuptools-67.5.1-py3-none-any.whl
         sha256: 1c39d42bda4cb89f7fdcad52b6762e3c309ec8f8715b27c684176b7d71283242

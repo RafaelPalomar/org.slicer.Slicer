@@ -1,0 +1,51 @@
+From da1521adb2737ed6e7ad3cd970a6902c9fb58d68 Mon Sep 17 00:00:00 2001
+From: Rafael Palomar <rafael.palomar@ous-research.no>
+Date: Mon, 20 Feb 2023 07:10:53 +0100
+Subject: [PATCH 1/9] ENH: Add an option to switch CMake HTTPS checks
+
+This adds a CMake variable (Slicer_CHECK_CMAKE_HTTPS_SUPPORT) to
+enable/disable the CMake https checks. This can be useful when building
+Slicer under network-isolated environments (i.e., flatpak).
+---
+ CMakeLists.txt   | 9 +++++++++
+ SuperBuild.cmake | 4 +++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f62422becd..20531a24dc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -65,6 +65,15 @@ set(CMAKE_MODULE_PATH
+ set(Slicer_CMAKE_DIR ${Slicer_SOURCE_DIR}/CMake)
+ set(Slicer_EXTENSIONS_CMAKE_DIR ${Slicer_SOURCE_DIR}/Extensions/CMake)
+ 
++#-----------------------------------------------------------------------------
++# Check CMake HTTPS support
++#-----------------------------------------------------------------------------
++# This option enables/disables a cmake check for https support. There are cases
++# in which network connectivity may be limited or non-exsisting (i.e., flatkpak
++# building environments). In those cases, this option should be disabled to
++# allow the build process to continue.
++option(Slicer_CHECK_CMAKE_HTTPS_SUPPORT "Enables CMake check for https support." ON)
++
+ #-----------------------------------------------------------------------------
+ # https://www.slicer.org/w/index.php/Documentation/Nightly/Developers/DevelopmentWithGit
+ #-----------------------------------------------------------------------------
+diff --git a/SuperBuild.cmake b/SuperBuild.cmake
+index 969907e968..f9a145551b 100644
+--- a/SuperBuild.cmake
++++ b/SuperBuild.cmake
+@@ -22,7 +22,9 @@
+ #-----------------------------------------------------------------------------
+ # CMake https support
+ #-----------------------------------------------------------------------------
+-include(SlicerCheckCMakeHTTPS)
++if(Slicer_CHECK_CMAKE_HTTPS_SUPPORT)
++  include(SlicerCheckCMakeHTTPS)
++endif()
+ 
+ #-----------------------------------------------------------------------------
+ # Git protocol option
+-- 
+2.39.2
+
