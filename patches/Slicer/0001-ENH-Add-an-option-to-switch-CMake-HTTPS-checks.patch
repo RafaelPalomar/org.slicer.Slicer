@@ -1,7 +1,7 @@
 From da1521adb2737ed6e7ad3cd970a6902c9fb58d68 Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Mon, 20 Feb 2023 07:10:53 +0100
-Subject: [PATCH 1/9] ENH: Add an option to switch CMake HTTPS checks
+Subject: [PATCH 01/14] ENH: Add an option to switch CMake HTTPS checks
 
 This adds a CMake variable (Slicer_CHECK_CMAKE_HTTPS_SUPPORT) to
 enable/disable the CMake https checks. This can be useful when building
@@ -47,5 +47,5 @@ index 969907e968..f9a145551b 100644
  #-----------------------------------------------------------------------------
  # Git protocol option
 -- 
-2.39.2
+2.39.3
 

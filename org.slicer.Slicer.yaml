@@ -1,36 +1,44 @@
 app-id: org.slicer.Slicer
 runtime: org.kde.Platform
-runtime-version: '5.15'
+runtime-version: '5.15-22.08'
 sdk: org.kde.Sdk
 base: io.qt.qtwebengine.BaseApp # KDE runtime environment does not provide the QtWebEngine component required for 3D Slicer
 base-version: '5.15-22.08'
-build-options:
-  # A more modern approach (according to ChatGPT) that apparently is only available to flatpak-builder >= 1.7.1
-  # ----------------
-  # build-options:
-  #   build-args:
-  #       - --build-arg=libpthread-stubs-devel
-  # ----------------
-  pre-build: |
-      #!/bin/bash
-      # libpthreads are needed for the build process
-      set -e
-      flatpak install -y --user libpthread-stubs-devel
-command: Slicer
+command: /app/Slicer/Slicer
 finish-args:
-  - |
-      --device=dri
-      --share=network
-      --share=ipc
-      --socket=x11
-      --device=dri
-      --filesystem=host
-      --socket=wayland
+  - --device=dri
+  - --share=network
+  - --share=ipc
+  - --socket=x11
+  - --filesystem=host
+  - --socket=wayland
+  - --env=LD_LIBRARY_PATH=/app/lib
 modules:
+  - name: libvpx
+    sources:
+      - type: git
+        url: https://chromium.googlesource.com/webm/libvpx
+        tag: v1.12.0
+    buildsystem: simple
+    build-commands:
+      - CC=gcc CXX=g++ ./configure --prefix=/app --enable-shared
+      - make -j${FLATPAK_BUILDER_N_JOBS}
+      - make install
+  - name: libicu
+    sources:
+      - type: archive
+        url: https://github.com/unicode-org/icu/archive/refs/tags/release-71-1.tar.gz
+        sha512: cc9ccb3208d8079c4f8169713aa0ebb930e86cf6c72510a3b7de5824e6482f26166a2e530abaaecfb8338764b23ac215b2921a821167b41d6a3f23952e2718e6
+    buildsystem: simple
+    build-commands:
+      - cd icu4c/source && CC=gcc CXX=g++ ./configure --prefix=/app
+      - cd icu4c/source && make -j${FLATPAK_BUILDER_N_JOBS}
+      - cd icu4c/source && make install
   - name: Slicer
     buildsystem: simple
     build-commands:
-      - cmake -S . -B Release -DCMAKE_BUILD_TYPE:STRING=Release -DSlicer_USE_SYSTEM_LibFFI:BOOL=ON -DITK_REMOTE_MODULES_DIR:FILEPATH=dependencies/ITK-Remote-Modules -DSlicer_CHECK_CMAKE_HTTPS_SUPPORT:BOOL=OFF
+      - cd dependencies/SimpleITK.git && git apply ${FLATPAK_BUILDER_BUILDDIR}/patches/SimpleITK/0001-ENH-ExternalData-only-on-testing.patch
+      - cmake -S . -B Release -DCMAKE_BUILD_TYPE:STRING=Release -DSlicer_USE_SYSTEM_LibFFI:BOOL=ON -DITK_REMOTE_MODULES_DIR:FILEPATH=dependencies/ITK-Remote-Modules -DSlicer_CHECK_CMAKE_HTTPS_SUPPORT:BOOL=OFF -DFLATPAK_BUILDER_BUILDDIR:FILEPATH=${FLATPAK_BUILDER_BUILDDIR} -DSlicer_USE_SimpleITK:BOOL=OFF -DBUILD_TESTING:BOOL=OFF
         -DSlicer_BRAINSTools_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/BRAINSTools.git
         -DSlicer_bzip2_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/bzip2.git
         -DSlicer_CompareVolumes_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CompareVolumes.git
@@ -73,33 +81,46 @@ modules:
         -DSlicer_python-scipy_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-scipy
         -DSlicer_python-setuptools_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-setuptools
         -DSlicer_python-wheel_WHEEL_PATH:STRING=${FLATPAK_BUILDER_BUILDDIR}/dependencies/python-wheel
-      - cmake --build Release -j1
+      - cmake --build Release -j${FLATPAK_BUILDER_N_JOBS}
+      - cd Release/Slicer-build && cpack
+      - ls ${FLATPAK_BUILDER_BUILDDIR}/Release/Slicer-build/Slicer*.tar.gz
+      - mkdir -p /app/Slicer
+      - tar xvzf ${FLATPAK_BUILDER_BUILDDIR}/Release/Slicer-build/Slicer*.tar.gz -C /app/Slicer --strip-components=1
     sources:
       - type: git
         url: https://github.com/Slicer/Slicer.git
         tag: main
       - type: patch
-        path: 0001-ENH-Add-an-option-to-switch-CMake-HTTPS-checks.patch
+        path: patches/Slicer/0001-ENH-Add-an-option-to-switch-CMake-HTTPS-checks.patch
       - type: patch
-        path: 0002-ENH-Print-external-dependencies-variables.patch
+        path: patches/Slicer/0002-ENH-Print-external-dependencies-variables.patch
       - type: patch
-        path: 0003-ENH-Expose-CTKAPPLAUNCHER-sources-variables.patch
+        path: patches/Slicer/0003-ENH-Expose-CTKAPPLAUNCHER-sources-variables.patch
       - type: patch
-        path: 0004-ENH-Disable-pull-of-git-submodules-for-RapidJSON.patch
+        path: patches/Slicer/0004-ENH-Disable-pull-of-git-submodules-for-RapidJSON.patch
       - type: patch
-        path: 0005-ENH-Expose-OpenSSL-dependencies-variables.patch
+        path: patches/Slicer/0005-ENH-Expose-OpenSSL-dependencies-variables.patch
       - type: patch
-        path: 0006-ENH-Expose-python-dependency-variables.patch
+        path: patches/Slicer/0006-ENH-Expose-python-dependency-variables.patch
       - type: patch
-        path: 0007-ENH-Expose-python-wheel-dependencies.patch
+        path: patches/Slicer/0007-ENH-Expose-python-wheel-dependencies.patch
       - type: patch
-        path: 0008-ENH-Supress-pull-of-git-modules-for-VTK.patch
+        path: patches/Slicer/0008-ENH-Supress-pull-of-git-modules-for-VTK.patch
       - type: patch
-        path: 0009-ENH-Enable-ITK-build-with-offline-remote-modules.patch
+        path: patches/Slicer/0009-ENH-Enable-ITK-build-with-offline-remote-modules.patch
       - type: patch
-        path: 0010-ENH-Enable-offline-remote-dependencies.patch
+        path: patches/Slicer/0010-ENH-Enable-offline-remote-dependencies.patch
       - type: patch
-        path: 0011-ENH-Enable-offline-PCRE-build.patch
+        path: patches/Slicer/0011-ENH-Enable-build-with-offilne-PCRE.patch
+      - type: patch
+        path: patches/Slicer/0012-ENH-Enable-build-with-onffline-swift.patch
+      - type: patch
+        path: patches/Slicer/0013-ENH-Patch-SimpleITK.patch
+      - type: patch
+        path: patches/Slicer/generated/CTK_SuperBuild.patch
+      - type: file
+        path: patches/SimpleITK/0001-ENH-ExternalData-only-on-testing.patch
+        dest: patches/SimpleITK
       - type: git
         url: https://github.com/BRAINSia/BRAINSTools
         tag: 37b0a0f64cbff2b987fee321c9363554cee52b14
@@ -130,7 +151,7 @@ modules:
         dest: dependencies/DCMTK.git
       - type: git
         url: https://github.com/Slicer/ITK
-        tag: 9745ba2fae8abf31175deae87ff3e55e81c0a663
+        tag: c927a320a7e318556fb00306bae81efe317a12ca
         dest: dependencies/ITK.git
       - type: git
         url: https://github.com/Slicer/jsoncpp
@@ -190,7 +211,7 @@ modules:
         dest: dependencies/sqlite.git
       - type: git
         url: https://github.com/Slicer/SlicerSurfaceToolbox
-        tag: 3b556d10307c5c9ee9fd8da1ea873ddc1d48acf3
+        tag: 25999cefa2554b5fa4698b847716f75837070e33
         dest: dependencies/SurfaceToolbox.git
       - type: git
         url: https://github.com/Slicer/teem
@@ -202,7 +223,7 @@ modules:
         dest: dependencies/vtkAddon.git
       - type: git
         url: https://github.com/slicer/VTK
-        tag: 7a000d76cbdafd10f4810e0027a12144a2c6f721
+        tag: 9bde2b3fa9887a801e3eec686ce591072986977f
         dest: dependencies/VTK.git
       - type: git
         url: https://github.com/commontk/zlib
@@ -452,6 +473,18 @@ modules:
         url: https://github.com/InsightSoftwareConsortium/itk-wasm.git
         tag:   80f0354caf375e26549864c5155b0484b59b8f05
         dest: dependencies/ITK-Remote-Modules/ITK-Remote-WebAssemblyInterface.remote.git
+      - type: git
+        url: https://github.com/commontk/CTKData
+        tag: cc07f1ff391b7828459c
+        dest: dependencies/CTK-dependencies/CTKData.git
+      - type: git
+        url: https://github.com/commontk/PythonQt
+        tag: c4a5a155b2942d4b003862c3317105b4a1ea6755
+        dest: dependencies/CTK-dependencies/PythonQt.git
+      - type: git
+        url: https://github.com/commontk/QtTesting
+        tag: b5324a213dc3c4abd7b588575ea926db57aa981e
+        dest: dependencies/CTK-dependencies/QtTesting.git
       - dest: dependencies/python-dicom-requirements
         dest-filename: pydicom-2.3.1-py3-none-any.whl
         sha256: b00bacdabc1f8a18b61a08bb6cd0f41c419446531638c895a708c22a35d69cfe
@@ -463,10 +496,10 @@ modules:
         type: file
         url: https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
       - dest: dependencies/python-dicom-requirements
-        dest-filename: Pillow-9.4.0.tar.gz
-        sha256: a1c2d7780448eb93fbcc3789bf3916aa5720d942e37945f4056680317f1cd23e
+        dest-filename: Pillow-9.4.0-cp39-cp39-manylinux_2_28_x86_64.whl
+        sha256: e8c5cf126889a4de385c02a2c3d3aba4b00f70234bfddae82a5eaa3ee6d5e3e6
         type: file
-        url: https://files.pythonhosted.org/packages/bc/07/830784e061fb94d67649f3e438ff63cfb902dec6d48ac75aeaaac7c7c30e/Pillow-9.4.0.tar.gz
+        url: https://files.pythonhosted.org/packages/de/e2/d1dda94185dba4fc019744076e52e2c6b450620938b2ded7b31ba90bd559/Pillow-9.4.0-cp39-cp39-manylinux_2_28_x86_64.whl
       - dest: dependencies/python-dicom-requirements
         dest-filename: retrying-1.3.4-py3-none-any.whl
         sha256: 8cc4d43cb8e1125e0ff3344e9de678fefd85db3b750b81b2240dc0183af37b35
@@ -478,10 +511,10 @@ modules:
         type: file
         url: https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
       - dest: dependencies/python-dicom-requirements
-        dest-filename: Pillow-9.4.0.tar.gz
-        sha256: a1c2d7780448eb93fbcc3789bf3916aa5720d942e37945f4056680317f1cd23e
+        dest-filename: Pillow-9.4.0-cp39-cp39-manylinux_2_28_x86_64.whl
+        sha256: e8c5cf126889a4de385c02a2c3d3aba4b00f70234bfddae82a5eaa3ee6d5e3e6
         type: file
-        url: https://files.pythonhosted.org/packages/bc/07/830784e061fb94d67649f3e438ff63cfb902dec6d48ac75aeaaac7c7c30e/Pillow-9.4.0.tar.gz
+        url: https://files.pythonhosted.org/packages/de/e2/d1dda94185dba4fc019744076e52e2c6b450620938b2ded7b31ba90bd559/Pillow-9.4.0-cp39-cp39-manylinux_2_28_x86_64.whl
       - dest: dependencies/python-dicom-requirements
         dest-filename: dicomweb_client-0.59.1-py3-none-any.whl
         sha256: ad4af95e1bdeb3691841cf8b28894fc6d9ba7ac5b7892bff70a506eedbd20d79
@@ -553,45 +586,45 @@ modules:
         type: file
         url: https://files.pythonhosted.org/packages/40/46/505f0dd53c14096f01922bf93a7abb4e40e29a06f858abbaa791e6954324/PyJWT-2.6.0-py3-none-any.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
-        dest-filename: wrapt-1.15.0.tar.gz
-        sha256: d06730c6aed78cee4126234cf2d071e01b44b915e725a6cb439a879ec9754a3a
+        dest-filename: wrapt-1.15.0-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        sha256: 9d37ac69edc5614b90516807de32d08cb8e7b12260a285ee330955604ed9dd29
         type: file
-        url: https://files.pythonhosted.org/packages/f8/7d/73e4e3cdb2c780e13f9d87dc10488d7566d8fd77f8d68f0e416bfbd144c7/wrapt-1.15.0.tar.gz
+        url: https://files.pythonhosted.org/packages/dd/eb/389f9975a6be31ddd19d29128a11f1288d07b624e464598a4b450f8d007e/wrapt-1.15.0-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
         dest-filename: Deprecated-1.2.13-py2.py3-none-any.whl
         sha256: 64756e3e14c8c5eea9795d93c524551432a0be75629f8f29e67ab8caf076c76d
         type: file
         url: https://files.pythonhosted.org/packages/51/6a/c3a0408646408f7283b7bc550c30a32cc791181ec4618592eec13e066ce3/Deprecated-1.2.13-py2.py3-none-any.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
-        dest-filename: wrapt-1.15.0.tar.gz
-        sha256: d06730c6aed78cee4126234cf2d071e01b44b915e725a6cb439a879ec9754a3a
+        dest-filename: wrapt-1.15.0-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        sha256: 9d37ac69edc5614b90516807de32d08cb8e7b12260a285ee330955604ed9dd29
         type: file
-        url: https://files.pythonhosted.org/packages/f8/7d/73e4e3cdb2c780e13f9d87dc10488d7566d8fd77f8d68f0e416bfbd144c7/wrapt-1.15.0.tar.gz
+        url: https://files.pythonhosted.org/packages/dd/eb/389f9975a6be31ddd19d29128a11f1288d07b624e464598a4b450f8d007e/wrapt-1.15.0-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
         dest-filename: pycparser-2.21-py2.py3-none-any.whl
         sha256: 8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9
         type: file
         url: https://files.pythonhosted.org/packages/62/d5/5f610ebe421e85889f2e55e33b7f9a6795bd982198517d912eb1c76e1a53/pycparser-2.21-py2.py3-none-any.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
-        dest-filename: cffi-1.15.1.tar.gz
-        sha256: d400bfb9a37b1351253cb402671cea7e89bdecc294e8016a707f6d1d8ac934f9
+        dest-filename: cffi-1.15.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        sha256: 5d598b938678ebf3c67377cdd45e09d431369c3b1a5b331058c338e201f12b27
         type: file
-        url: https://files.pythonhosted.org/packages/2b/a8/050ab4f0c3d4c1b8aaa805f70e26e84d0e27004907c5b8ecc1d31815f92a/cffi-1.15.1.tar.gz
+        url: https://files.pythonhosted.org/packages/2d/86/3ca57cddfa0419f6a95d1c8478f8f622ba597e3581fd501bbb915b20eb75/cffi-1.15.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
         dest-filename: pycparser-2.21-py2.py3-none-any.whl
         sha256: 8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9
         type: file
         url: https://files.pythonhosted.org/packages/62/d5/5f610ebe421e85889f2e55e33b7f9a6795bd982198517d912eb1c76e1a53/pycparser-2.21-py2.py3-none-any.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
-        dest-filename: PyNaCl-1.5.0.tar.gz
-        sha256: 8ac7448f09ab85811607bdd21ec2464495ac8b7c66d146bf545b0f08fb9220ba
+        dest-filename: PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl
+        sha256: 0c84947a22519e013607c9be43706dd42513f9e6ae5d39d3613ca1e142fba44d
         type: file
-        url: https://files.pythonhosted.org/packages/a7/22/27582568be639dfe22ddb3902225f91f2f17ceff88ce80e4db396c8986da/PyNaCl-1.5.0.tar.gz
+        url: https://files.pythonhosted.org/packages/ee/87/f1bb6a595f14a327e8285b9eb54d41fef76c585a0edef0a45f6fc95de125/PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
-        dest-filename: cffi-1.15.1.tar.gz
-        sha256: d400bfb9a37b1351253cb402671cea7e89bdecc294e8016a707f6d1d8ac934f9
+        dest-filename: cffi-1.15.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        sha256: 5d598b938678ebf3c67377cdd45e09d431369c3b1a5b331058c338e201f12b27
         type: file
-        url: https://files.pythonhosted.org/packages/2b/a8/050ab4f0c3d4c1b8aaa805f70e26e84d0e27004907c5b8ecc1d31815f92a/cffi-1.15.1.tar.gz
+        url: https://files.pythonhosted.org/packages/2d/86/3ca57cddfa0419f6a95d1c8478f8f622ba597e3581fd501bbb915b20eb75/cffi-1.15.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
         dest-filename: pycparser-2.21-py2.py3-none-any.whl
         sha256: 8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9
@@ -613,35 +646,35 @@ modules:
         type: file
         url: https://files.pythonhosted.org/packages/40/46/505f0dd53c14096f01922bf93a7abb4e40e29a06f858abbaa791e6954324/PyJWT-2.6.0-py3-none-any.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
-        dest-filename: PyNaCl-1.5.0.tar.gz
-        sha256: 8ac7448f09ab85811607bdd21ec2464495ac8b7c66d146bf545b0f08fb9220ba
+        dest-filename: PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl
+        sha256: 0c84947a22519e013607c9be43706dd42513f9e6ae5d39d3613ca1e142fba44d
         type: file
-        url: https://files.pythonhosted.org/packages/a7/22/27582568be639dfe22ddb3902225f91f2f17ceff88ce80e4db396c8986da/PyNaCl-1.5.0.tar.gz
+        url: https://files.pythonhosted.org/packages/ee/87/f1bb6a595f14a327e8285b9eb54d41fef76c585a0edef0a45f6fc95de125/PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
-        dest-filename: cffi-1.15.1.tar.gz
-        sha256: d400bfb9a37b1351253cb402671cea7e89bdecc294e8016a707f6d1d8ac934f9
+        dest-filename: cffi-1.15.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        sha256: 5d598b938678ebf3c67377cdd45e09d431369c3b1a5b331058c338e201f12b27
         type: file
-        url: https://files.pythonhosted.org/packages/2b/a8/050ab4f0c3d4c1b8aaa805f70e26e84d0e27004907c5b8ecc1d31815f92a/cffi-1.15.1.tar.gz
+        url: https://files.pythonhosted.org/packages/2d/86/3ca57cddfa0419f6a95d1c8478f8f622ba597e3581fd501bbb915b20eb75/cffi-1.15.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
         dest-filename: pycparser-2.21-py2.py3-none-any.whl
         sha256: 8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9
         type: file
         url: https://files.pythonhosted.org/packages/62/d5/5f610ebe421e85889f2e55e33b7f9a6795bd982198517d912eb1c76e1a53/pycparser-2.21-py2.py3-none-any.whl
       - dest: dependencies/python-extension-manager-ssl-requirements
-        dest-filename: wrapt-1.15.0.tar.gz
-        sha256: d06730c6aed78cee4126234cf2d071e01b44b915e725a6cb439a879ec9754a3a
+        dest-filename: wrapt-1.15.0-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        sha256: 9d37ac69edc5614b90516807de32d08cb8e7b12260a285ee330955604ed9dd29
         type: file
-        url: https://files.pythonhosted.org/packages/f8/7d/73e4e3cdb2c780e13f9d87dc10488d7566d8fd77f8d68f0e416bfbd144c7/wrapt-1.15.0.tar.gz
+        url: https://files.pythonhosted.org/packages/dd/eb/389f9975a6be31ddd19d29128a11f1288d07b624e464598a4b450f8d007e/wrapt-1.15.0-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - dest: dependencies/python-numpy
         dest-filename: nose-1.3.7-py3-none-any.whl
         sha256: 9ff7c6cc443f8c51994b34a667bbcf45afd6d945be7477b52e97516fd17c53ac
         type: file
         url: https://files.pythonhosted.org/packages/15/d8/dd071918c040f50fa1cf80da16423af51ff8ce4a0f2399b7bf8de45ac3d9/nose-1.3.7-py3-none-any.whl
       - dest: dependencies/python-numpy
-        dest-filename: numpy-1.24.2.tar.gz
-        sha256: 003a9f530e880cb2cd177cba1af7220b9aa42def9c4afc2a2fc3ee6be7eb2b22
+        dest-filename: numpy-1.24.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        sha256: f64bb98ac59b3ea3bf74b02f13836eb2e24e48e0ab0145bbda646295769bd780
         type: file
-        url: https://files.pythonhosted.org/packages/e4/a9/6704bb5e1d1d778d3a6ee1278a8d8134f0db160e09d52863a24edb58eab5/numpy-1.24.2.tar.gz
+        url: https://files.pythonhosted.org/packages/f4/f4/45e6e3f7a23b9023554903a122c95585e9787f9403d386bafb7a95d24c9b/numpy-1.24.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - dest: dependencies/python-pip
         dest-filename: pip-23.0.1-py3-none-any.whl
         sha256: 236bcb61156d76c4b8a05821b988c7b8c35bf0da28a4b614e8d6ab5212c25c6f
@@ -673,10 +706,10 @@ modules:
         type: file
         url: https://files.pythonhosted.org/packages/fc/34/3030de6f1370931b9dbb4dad48f6ab1015ab1d32447850b9fc94e60097be/idna-3.4-py3-none-any.whl
       - dest: dependencies/python-requests-requirements
-        dest-filename: charset-normalizer-3.1.0.tar.gz
-        sha256: 34e0a2f9c370eb95597aae63bf85eb5e96826d81e3dcf88b8886012906f509b5
+        dest-filename: charset_normalizer-3.1.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        sha256: 21fa558996782fc226b529fdd2ed7866c2c6ec91cee82735c98a197fae39f706
         type: file
-        url: https://files.pythonhosted.org/packages/ff/d7/8d757f8bd45be079d76309248845a04f09619a7b17d6dfc8c9ff6433cac2/charset-normalizer-3.1.0.tar.gz
+        url: https://files.pythonhosted.org/packages/33/97/9967fb2d364a9da38557e4af323abcd58cc05bdd8f77e9fd5ae4882772cc/charset_normalizer-3.1.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - dest: dependencies/python-requests-requirements
         dest-filename: urllib3-1.26.14-py2.py3-none-any.whl
         sha256: 75edcdc2f7d85b137124a6c3c9fc3933cdeaa12ecb9a6a959f22797a0feca7e1
@@ -688,10 +721,10 @@ modules:
         type: file
         url: https://files.pythonhosted.org/packages/71/4c/3db2b8021bd6f2f0ceb0e088d6b2d49147671f25832fb17970e9b583d742/certifi-2022.12.7-py3-none-any.whl
       - dest: dependencies/python-requests-requirements
-        dest-filename: charset-normalizer-3.1.0.tar.gz
-        sha256: 34e0a2f9c370eb95597aae63bf85eb5e96826d81e3dcf88b8886012906f509b5
+        dest-filename: charset_normalizer-3.1.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        sha256: 21fa558996782fc226b529fdd2ed7866c2c6ec91cee82735c98a197fae39f706
         type: file
-        url: https://files.pythonhosted.org/packages/ff/d7/8d757f8bd45be079d76309248845a04f09619a7b17d6dfc8c9ff6433cac2/charset-normalizer-3.1.0.tar.gz
+        url: https://files.pythonhosted.org/packages/33/97/9967fb2d364a9da38557e4af323abcd58cc05bdd8f77e9fd5ae4882772cc/charset_normalizer-3.1.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - dest: dependencies/python-requests-requirements
         dest-filename: idna-3.4-py3-none-any.whl
         sha256: 90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
@@ -708,10 +741,15 @@ modules:
         type: file
         url: https://files.pythonhosted.org/packages/fe/ca/466766e20b767ddb9b951202542310cba37ea5f2d792dae7589f1741af58/urllib3-1.26.14-py2.py3-none-any.whl
       - dest: dependencies/python-scipy
-        dest-filename: scipy-1.10.1.tar.gz
-        sha256: 2cf9dfb80a7b4589ba4c40ce7588986d6d5cebc5457cad2c2880f6bc2d42f3a5
+        dest-filename: scipy-1.10.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+        sha256: 1b4735d6c28aad3cdcf52117e0e91d6b39acd4272f3f5cd9907c24ee931ad601
         type: file
-        url: https://files.pythonhosted.org/packages/84/a9/2bf119f3f9cff1f376f924e39cfae18dec92a1514784046d185731301281/scipy-1.10.1.tar.gz
+        url: https://files.pythonhosted.org/packages/5d/30/b2a2a5bf1a3beefb7609fb871dcc6aef7217c69cef19a4631b7ab5622a8a/scipy-1.10.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+      - dest: dependencies/python-scipy
+        dest-filename: meson_python-0.11.0-py3-none-any.whl
+        sha256: 78bde58c88b2fa7691fcb1a97daa0a75f33a76f2ada9d605b75d70dd6505b48f
+        type: file
+        url: https://files.pythonhosted.org/packages/3d/e9/01bc1bf0a5feaaac504e1e5ad5a8b24088729103fb7229f57fb5c248b2a5/meson_python-0.11.0-py3-none-any.whl
       - dest: dependencies/python-setuptools
         dest-filename: setuptools-67.5.1-py3-none-any.whl
         sha256: 1c39d42bda4cb89f7fdcad52b6762e3c309ec8f8715b27c684176b7d71283242

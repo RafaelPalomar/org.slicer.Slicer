@@ -1,19 +1,20 @@
-From 59c8c296cee5126c11972bdc0fea49bd72065667 Mon Sep 17 00:00:00 2001
+From fd1ed9dabe6f7ababa7f839042bbdfa29d016db9 Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Thu, 20 Apr 2023 15:42:51 +0200
-Subject: [PATCH] ENH: Expose python wheel dependencies
+Subject: [PATCH 07/14] ENH: Expose python wheel dependencies
 
 ---
- .../External_python-dicom-requirements.cmake  | 18 ++++++++++++++-
- ...ython-extension-manager-requirements.cmake | 20 +++++++++++++++-
- SuperBuild/External_python-numpy.cmake        | 18 ++++++++++++++-
- SuperBuild/External_python-pip.cmake          | 20 ++++++++++++++--
- ...xternal_python-pythonqt-requirements.cmake | 20 ++++++++++++++--
- ...xternal_python-requests-requirements.cmake | 18 ++++++++++++++-
- SuperBuild/External_python-scipy.cmake        | 18 ++++++++++++++-
- SuperBuild/External_python-setuptools.cmake   | 23 +++++++++++++++----
- SuperBuild/External_python-wheel.cmake        | 18 ++++++++++++++-
- 9 files changed, 159 insertions(+), 14 deletions(-)
+ .../External_python-dicom-requirements.cmake  | 18 ++++++++++++-
+ ...ython-extension-manager-requirements.cmake | 20 ++++++++++++++-
+ ...n-extension-manager-ssl-requirements.cmake | 18 ++++++++++++-
+ SuperBuild/External_python-numpy.cmake        | 18 ++++++++++++-
+ SuperBuild/External_python-pip.cmake          | 20 +++++++++++++--
+ ...xternal_python-pythonqt-requirements.cmake | 20 +++++++++++++--
+ ...xternal_python-requests-requirements.cmake | 18 ++++++++++++-
+ SuperBuild/External_python-scipy.cmake        | 25 +++++++++++++++++--
+ SuperBuild/External_python-setuptools.cmake   | 23 ++++++++++++++---
+ SuperBuild/External_python-wheel.cmake        | 18 ++++++++++++-
+ 10 files changed, 182 insertions(+), 16 deletions(-)
 
 diff --git a/SuperBuild/External_python-dicom-requirements.cmake b/SuperBuild/External_python-dicom-requirements.cmake
 index 4f88dff880..1a5ad2d05b 100644
@@ -81,6 +82,42 @@ index 15cee0f6ee..3200441ce7 100644
      ${${proj}_EP_ARGS}
      DOWNLOAD_COMMAND ""
 @@ -60,7 +78,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+     BUILD_IN_SOURCE 1
+     CONFIGURE_COMMAND ""
+     BUILD_COMMAND ""
+-    INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file}
++    INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND}
+     LOG_INSTALL 1
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
+diff --git a/SuperBuild/External_python-extension-manager-ssl-requirements.cmake b/SuperBuild/External_python-extension-manager-ssl-requirements.cmake
+index dba7d7194d..567d8066b7 100644
+--- a/SuperBuild/External_python-extension-manager-ssl-requirements.cmake
++++ b/SuperBuild/External_python-extension-manager-ssl-requirements.cmake
+@@ -99,6 +99,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+   # [/PyGithub]
+   ]===])
+ 
++  # This block considers the possibility that the dependencies are given as a single file (one dependency)
++  # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
++  if(DEFINED Slicer_${proj}_WHEEL_PATH)
++    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --no-deps)
++      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
++      foreach(WHEEL_FILE ${WHEEL_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      endforeach()
++    else()
++      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --no-deps ${Slicer_${proj}_WHEEL_PATH})
++    endif()
++  else()
++    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
++  endif()
++
+   ExternalProject_Add(${proj}
+     ${${proj}_EP_ARGS}
+     DOWNLOAD_COMMAND ""
+@@ -106,7 +122,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
      BUILD_IN_SOURCE 1
      CONFIGURE_COMMAND ""
      BUILD_COMMAND ""
@@ -248,21 +285,29 @@ index 05deb6200a..9cff5b4dd9 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 diff --git a/SuperBuild/External_python-scipy.cmake b/SuperBuild/External_python-scipy.cmake
-index 40b04b1be6..e89e471fc4 100644
+index 40b04b1be6..d3304e5f80 100644
 --- a/SuperBuild/External_python-scipy.cmake
 +++ b/SuperBuild/External_python-scipy.cmake
-@@ -44,6 +44,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -42,7 +42,28 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+                 --hash=sha256:1b4735d6c28aad3cdcf52117e0e91d6b39acd4272f3f5cd9907c24ee931ad601 \
+                 --hash=sha256:7ff7f37b1bf4417baca958d254e8e2875d0cc23aaadbe65b3d5b3077b0eb23ea
    # [/scipy]
-   ]===])
- 
+-  ]===])
++  # [meson-python]
++  meson-python==0.12.0 --hash=sha256:3a2e7bfabf37f1878ad7b5556399deaf2dbffead85a50fc681a8bd4f4ef63da5
++  # [/meson-python]
++  ]===]
++)
++
 +  # This block considers the possibility that the dependencies are given as a single file (one dependency)
 +  # or as a directory of dependencies, in which case all the *.whl files in the directory will be installed
 +  if(DEFINED Slicer_${proj}_WHEEL_PATH)
 +    if(IS_DIRECTORY "${Slicer_${proj}_WHEEL_PATH}")
 +      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --no-deps)
 +      file(GLOB WHEEL_FILES "${Slicer_${proj}_WHEEL_PATH}/*.whl")
-+      foreach(WHEEL_FILE ${WHEEL_FILES})
-+        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${WHEEL_FILE})
++      file(GLOB TAR_FILES "${Slicer_${proj}_WHEEL_PATH}/*.tar.gz")
++      foreach(PACKAGE_FILE ${WHEEL_FILES} ${TAR_FILES})
++        set(Slicer_${proj}_INSTALL_COMMAND ${Slicer_${proj}_INSTALL_COMMAND} ${PACKAGE_FILE})
 +      endforeach()
 +    else()
 +      set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --no-deps ${Slicer_${proj}_WHEEL_PATH})
@@ -270,11 +315,10 @@ index 40b04b1be6..e89e471fc4 100644
 +  else()
 +    set(Slicer_${proj}_INSTALL_COMMAND ${PYTHON_EXECUTABLE} -m pip install --require-hashes -r ${requirements_file})
 +  endif()
-+
+ 
    ExternalProject_Add(${proj}
      ${${proj}_EP_ARGS}
-     DOWNLOAD_COMMAND ""
-@@ -51,7 +67,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -51,7 +72,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
      BUILD_IN_SOURCE 1
      CONFIGURE_COMMAND ""
      BUILD_COMMAND ""
@@ -362,5 +406,5 @@ index bae6337328..82310d1a14 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 -- 
-2.39.2
+2.39.3
 

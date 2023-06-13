@@ -1,0 +1,21 @@
+diff --git a/SuperBuild/SuperBuild.cmake b/SuperBuild/SuperBuild.cmake
+index 494a8358..349ce29d 100644
+--- a/SuperBuild/SuperBuild.cmake
++++ b/SuperBuild/SuperBuild.cmake
+@@ -45,12 +45,15 @@ set(CMAKE_MODULE_PATH
+ include(sitkPreventInSourceBuilds)
+ include(sitkPreventInBuildInstalls)
+ include(VariableList)
+-include(sitkExternalData)
+ include( sitkSITKLegacyNaming )
+ include(sitkUseCCache)
+ include(sitkUseGoldLinker)
+ 
++if(BUILD_TESTING)
++  include(sitkExternalData)
++endif()
+ 
++include(ExternalData)
+ 
+ add_custom_target( SuperBuildSimpleITKSource )
+ 

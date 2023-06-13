@@ -1,0 +1,18 @@
+diff --git a/SuperBuild/External_CTK.cmake b/SuperBuild/External_CTK.cmake
+index bfec814..872ce46 100644
+--- a/SuperBuild/External_CTK.cmake
++++ b/SuperBuild/External_CTK.cmake
+@@ -65,6 +65,13 @@ if(NOT DEFINED CTK_DIR AND NOT Slicer_USE_SYSTEM_${proj})
+       -DCTK_QT_VERSION:STRING=5
+       )
+ 
++    list(APPEND EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS
++      # Here there could be flags generated (e.g., Flatpak)
++-DCTKData_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTK-dependencies/CTKData.git
++-DPythonQt_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTK-dependencies/PythonQt.git
++-DQtTesting_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CTK-dependencies/QtTesting.git
++      )
++
+   ExternalProject_SetIfNotDefined(
+     Slicer_${proj}_GIT_REPOSITORY
+     "${EP_GIT_PROTOCOL}://github.com/commontk/CTK.git"

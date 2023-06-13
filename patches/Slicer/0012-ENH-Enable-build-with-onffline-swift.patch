@@ -1,0 +1,40 @@
+From bf43380a354a998a77031a7b2bc7ca049520447a Mon Sep 17 00:00:00 2001
+From: Rafael Palomar <rafael.palomar@ous-research.no>
+Date: Fri, 5 May 2023 07:07:52 +0200
+Subject: [PATCH 12/14] ENH: Enable build with onffline swift
+
+---
+ SuperBuild/External_Swig.cmake | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/SuperBuild/External_Swig.cmake b/SuperBuild/External_Swig.cmake
+index dc7163fc1b..41378b4815 100644
+--- a/SuperBuild/External_Swig.cmake
++++ b/SuperBuild/External_Swig.cmake
+@@ -85,9 +85,21 @@ ExternalProject_Execute(${proj} \"configure\" sh ${EP_SOURCE_DIR}/configure
+     --with-python=${PYTHON_EXECUTABLE})
+ ")
+ 
++    ExternalProject_SetIfNotDefined(
++      Slicer_${proj}_ARCHIVE_URL
++      https://github.com/Slicer/SlicerBinaryDependencies/releases/download/swig/swig-${SWIG_TARGET_VERSION}.tar.gz
++      QUIET
++    )
++
++    ExternalProject_SetIfNotDefined(
++      Slicer_${proj}_ARCHIVE_SHA512
++      ${SWIG_DOWNLOAD_SOURCE_HASH}
++      QUIET
++    )
++
+     ExternalProject_add(Swig
+-      URL https://github.com/Slicer/SlicerBinaryDependencies/releases/download/swig/swig-${SWIG_TARGET_VERSION}.tar.gz
+-      URL_HASH SHA512=${SWIG_DOWNLOAD_SOURCE_HASH}
++      URL ${Slicer_${proj}_ARCHIVE_URL}
++      URL_HASH SHA512=${Slicer_${proj}_ARCHIVE_SHA512}
+       DOWNLOAD_DIR ${CMAKE_BINARY_DIR}
+       SOURCE_DIR ${EP_SOURCE_DIR}
+       BINARY_DIR ${EP_BINARY_DIR}
+-- 
+2.39.3
+
