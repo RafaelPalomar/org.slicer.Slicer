@@ -1,7 +1,7 @@
-From 49d5a1692bb761b1429870e493b1b510f00503f5 Mon Sep 17 00:00:00 2001
+From 810c648384ab4836f3cbcede3ba72d8e1b08e6ce Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Mon, 6 Mar 2023 08:27:23 +0100
-Subject: [PATCH 04/14] ENH: Disable pull of git submodules for RapidJSON
+Subject: [PATCH 04/15] ENH: Disable pull of git submodules for RapidJSON
 
 ---
  SuperBuild/External_RapidJSON.cmake | 3 ++-

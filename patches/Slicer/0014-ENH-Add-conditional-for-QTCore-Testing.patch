@@ -1,7 +1,7 @@
-From ded0fb15e4b98a2659786092cd001f7c82ab75f0 Mon Sep 17 00:00:00 2001
+From 903ee1b2c1018de5b5e3f86dfc16720e01d90436 Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Wed, 24 May 2023 08:49:49 +0200
-Subject: [PATCH 14/14] ENH: Add conditional for QTCore/Testing
+Subject: [PATCH 14/15] ENH: Add conditional for QTCore/Testing
 
 ---
  Base/QTCore/CMakeLists.txt | 4 +++-

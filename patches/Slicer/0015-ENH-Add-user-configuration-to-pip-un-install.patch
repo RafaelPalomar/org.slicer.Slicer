@@ -1,0 +1,57 @@
+From 09de3fae3d5ec7b63a7a2ed7249dd193ec80a1ed Mon Sep 17 00:00:00 2001
+From: Rafael Palomar <rafael.palomar@ous-research.no>
+Date: Sat, 24 Jun 2023 22:45:06 +0200
+Subject: [PATCH] ENH: Add user configuration to pip (un-)install
+
+---
+ Base/Python/slicer/util.py                    | 4 ++--
+ CMake/SlicerBlockCTKAppLauncherSettings.cmake | 3 +++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/Base/Python/slicer/util.py b/Base/Python/slicer/util.py
+index 238e13efc3..12fbaf602b 100644
+--- a/Base/Python/slicer/util.py
++++ b/Base/Python/slicer/util.py
+@@ -3584,9 +3584,9 @@ def pip_install(requirements):
+     if type(requirements) == str:
+         # shlex.split splits string the same way as the shell (keeping quoted string as a single argument)
+         import shlex
+-        args = 'install', *(shlex.split(requirements))
++        args = 'install', '--target', '/var/data/python3.9/site-packages', *(shlex.split(requirements))
+     elif type(requirements) == list:
+-        args = 'install', *requirements
++        args = 'install', '--target', '/var/data/python3.9/site-packages', *requirements
+     else:
+         raise ValueError("pip_install requirement input must be string or list")
+ 
+diff --git a/CMake/SlicerBlockCTKAppLauncherSettings.cmake b/CMake/SlicerBlockCTKAppLauncherSettings.cmake
+index e5d0cce6a2..8787979a60 100644
+--- a/CMake/SlicerBlockCTKAppLauncherSettings.cmake
++++ b/CMake/SlicerBlockCTKAppLauncherSettings.cmake
+@@ -187,6 +187,7 @@ if(Slicer_USE_PYTHONQT)
+     list(APPEND SLICER_PYTHONPATH_BUILD
+       "<APPLAUNCHER_SETTINGS_DIR>/${Slicer_QTLOADABLEMODULES_LIB_DIR}/<CMAKE_CFG_INTDIR>"
+       "<APPLAUNCHER_SETTINGS_DIR>/${Slicer_QTLOADABLEMODULES_PYTHON_LIB_DIR}"
++      "/var/data/python3.9/site-packages"
+       )
+   endif()
+ 
+@@ -237,6 +238,7 @@ set(SLICER_LIBRARY_PATHS_INSTALLED
+   <APPLAUNCHER_SETTINGS_DIR>/../${Slicer_LIB_DIR}
+   <APPLAUNCHER_SETTINGS_DIR>/../${Slicer_CLIMODULES_LIB_DIR}
+   <APPLAUNCHER_SETTINGS_DIR>/../${Slicer_QTLOADABLEMODULES_LIB_DIR}
++  <APPLAUNCHER_SETTINGS_DIR>/../${Slicer_QTLOADABLEMODULES_LIB_DIR}
+   )
+ 
+ # The following lines allow Slicer to load a CLI module extension that depends
+@@ -318,6 +320,7 @@ if(Slicer_USE_PYTHONQT)
+     "<APPLAUNCHER_SETTINGS_DIR>/../lib/vtkTeem"
+     "<APPLAUNCHER_SETTINGS_DIR>/../bin/Python"
+     "<APPLAUNCHER_SETTINGS_DIR>/../${Slicer_QTLOADABLEMODULES_PYTHON_LIB_DIR}"
++    "/var/data/python3.9/site-packages"
+     )
+ 
+   # External projects - pythonpath
+-- 
+2.39.3
+

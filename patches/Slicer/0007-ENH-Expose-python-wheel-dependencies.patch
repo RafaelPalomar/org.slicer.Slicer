@@ -1,7 +1,7 @@
-From fd1ed9dabe6f7ababa7f839042bbdfa29d016db9 Mon Sep 17 00:00:00 2001
+From 58e479b54c836948f669bf4ca38e153f5c8b156e Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Thu, 20 Apr 2023 15:42:51 +0200
-Subject: [PATCH 07/14] ENH: Expose python wheel dependencies
+Subject: [PATCH 07/15] ENH: Expose python wheel dependencies
 
 ---
  .../External_python-dicom-requirements.cmake  | 18 ++++++++++++-

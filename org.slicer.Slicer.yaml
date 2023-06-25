@@ -6,19 +6,22 @@ base: io.qt.qtwebengine.BaseApp # KDE runtime environment does not provide the Q
 base-version: '5.15-22.08'
 command: /app/Slicer/Slicer
 finish-args:
-  - --device=dri
-  - --share=network
-  - --share=ipc
-  - --socket=x11
-  - --filesystem=host
-  - --socket=wayland
-  - --env=LD_LIBRARY_PATH=/app/lib
+  -  --device=dri
+  -  --share=network
+  -  --share=ipc
+  -  --socket=x11
+  -  --device=dri
+  -  --filesystem=xdg-data
+  -  --socket=wayland
+  -  --env=LD_LIBRARY_PATH=/app/lib
+  -  --env=QTWEBENGINEPROCESS_PATH=/app/bin/QtWebEngineProcess
+  -  --env=QTWEBENGINE_DISABLE_SANDBOX=1
 modules:
   - name: libvpx
     sources:
       - type: git
         url: https://chromium.googlesource.com/webm/libvpx
-        tag: v1.12.0
+        tag: main
     buildsystem: simple
     build-commands:
       - CC=gcc CXX=g++ ./configure --prefix=/app --enable-shared
@@ -37,8 +40,9 @@ modules:
   - name: Slicer
     buildsystem: simple
     build-commands:
-      - cd dependencies/SimpleITK.git && git apply ${FLATPAK_BUILDER_BUILDDIR}/patches/SimpleITK/0001-ENH-ExternalData-only-on-testing.patch
-      - cmake -S . -B Release -DCMAKE_BUILD_TYPE:STRING=Release -DSlicer_USE_SYSTEM_LibFFI:BOOL=ON -DITK_REMOTE_MODULES_DIR:FILEPATH=dependencies/ITK-Remote-Modules -DSlicer_CHECK_CMAKE_HTTPS_SUPPORT:BOOL=OFF -DFLATPAK_BUILDER_BUILDDIR:FILEPATH=${FLATPAK_BUILDER_BUILDDIR} -DSlicer_USE_SimpleITK:BOOL=OFF -DBUILD_TESTING:BOOL=OFF
+      - ln -s /usr/bin/ccache cc
+      - ln -s /usr/bin/ccache c++
+      - cmake -S . -B Release -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=c++ -DCMAKE_BUILD_TYPE:STRING=Release -DSlicer_USE_SYSTEM_LibFFI:BOOL=ON -DITK_REMOTE_MODULES_DIR:FILEPATH=dependencies/ITK-Remote-Modules -DSlicer_CHECK_CMAKE_HTTPS_SUPPORT:BOOL=OFF -DFLATPAK_BUILDER_BUILDDIR:FILEPATH=${FLATPAK_BUILDER_BUILDDIR} -DSlicer_STORE_SETTINGS_IN_APPLICATION_HOME_DIR:BOOL=OFF -DSlicer_USE_SimpleITK:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DSlicer_FORCED_REVISION=31810
         -DSlicer_BRAINSTools_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/BRAINSTools.git
         -DSlicer_bzip2_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/bzip2.git
         -DSlicer_CompareVolumes_GIT_REPOSITORY:STRING=file://${FLATPAK_BUILDER_BUILDDIR}/dependencies/CompareVolumes.git
@@ -86,10 +90,16 @@ modules:
       - ls ${FLATPAK_BUILDER_BUILDDIR}/Release/Slicer-build/Slicer*.tar.gz
       - mkdir -p /app/Slicer
       - tar xvzf ${FLATPAK_BUILDER_BUILDDIR}/Release/Slicer-build/Slicer*.tar.gz -C /app/Slicer --strip-components=1
+      - install -Dm 644 org.slicer.Slicer.desktop /app/share/applications/org.slicer.Slicer.desktop
+      - install -Dm 644 org.slicer.Slicer.png /app/share/icons/hicolor/128x128/apps/org.slicer.Slicer.png
     sources:
       - type: git
         url: https://github.com/Slicer/Slicer.git
-        tag: main
+        tag: 1bd1dcf8c1946dc5f803b31dc901d0040b4c3f9f
+      - type: file
+        path: org.slicer.Slicer.desktop
+      - type: file
+        path: org.slicer.Slicer.png
       - type: patch
         path: patches/Slicer/0001-ENH-Add-an-option-to-switch-CMake-HTTPS-checks.patch
       - type: patch
@@ -115,12 +125,9 @@ modules:
       - type: patch
         path: patches/Slicer/0012-ENH-Enable-build-with-onffline-swift.patch
       - type: patch
-        path: patches/Slicer/0013-ENH-Patch-SimpleITK.patch
+        path: patches/Slicer/0015-ENH-Add-user-configuration-to-pip-un-install.patch
       - type: patch
         path: patches/Slicer/generated/CTK_SuperBuild.patch
-      - type: file
-        path: patches/SimpleITK/0001-ENH-ExternalData-only-on-testing.patch
-        dest: patches/SimpleITK
       - type: git
         url: https://github.com/BRAINSia/BRAINSTools
         tag: 37b0a0f64cbff2b987fee321c9363554cee52b14

@@ -1,7 +1,7 @@
-From e97f23814180e055cff82eb38519e614e2306b95 Mon Sep 17 00:00:00 2001
+From 35b3d788e540a5ff9a508f38237232059d4e9e00 Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Mon, 6 Mar 2023 08:28:07 +0100
-Subject: [PATCH 06/14] ENH: Expose python dependency variables
+Subject: [PATCH 06/15] ENH: Expose python dependency variables
 
 ---
  SuperBuild/External_python.cmake | 16 ++++++++++++++--
