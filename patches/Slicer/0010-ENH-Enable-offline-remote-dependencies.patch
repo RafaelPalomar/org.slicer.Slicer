@@ -1,0 +1,27 @@
+From 621935753b7c08556007615ee44d60545cceeab3 Mon Sep 17 00:00:00 2001
+From: Rafael Palomar <rafael.palomar@ous-research.no>
+Date: Fri, 5 May 2023 07:06:29 +0200
+Subject: [PATCH 10/15] ENH: Enable offline remote dependencies
+
+---
+ CMake/ExternalProjectAddSource.cmake | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/CMake/ExternalProjectAddSource.cmake b/CMake/ExternalProjectAddSource.cmake
+index 9fc5cecc93..c5bcbc8480 100644
+--- a/CMake/ExternalProjectAddSource.cmake
++++ b/CMake/ExternalProjectAddSource.cmake
+@@ -230,6 +230,10 @@ macro(Slicer_Remote_Add projectname)
+     endforeach()
+   endif()
+ 
++  if(DEFINED Slicer_${projectname}_GIT_REPOSITORY)
++    set(_ep_GIT_REPOSITORY ${Slicer_${projectname}_GIT_REPOSITORY})
++  endif()
++
+   #message("[${projectname}] Option (${_ep_OPTION_NAME}) value ${${_ep_OPTION_NAME}}")
+   if(_add_source)
+     message(STATUS "Remote - ${projectname} [OK]")
+-- 
+2.39.3
+

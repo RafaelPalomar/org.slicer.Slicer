@@ -1,0 +1,24 @@
+From 903ee1b2c1018de5b5e3f86dfc16720e01d90436 Mon Sep 17 00:00:00 2001
+From: Rafael Palomar <rafael.palomar@ous-research.no>
+Date: Wed, 24 May 2023 08:49:49 +0200
+Subject: [PATCH 14/15] ENH: Add conditional for QTCore/Testing
+
+---
+ Base/QTCore/CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Base/QTCore/CMakeLists.txt b/Base/QTCore/CMakeLists.txt
+index 0c9aead4d0..e46b4737e8 100644
+--- a/Base/QTCore/CMakeLists.txt
++++ b/Base/QTCore/CMakeLists.txt
+@@ -297,4 +297,6 @@ endif()
+ #       Extensions. For that reason, the Testing directory is added inconditionnally.
+ #       The code specific to Slicer will be excluded directly in either Testing/Python
+ #       or Testing/Cxx.
+-add_subdirectory(Testing)
++if(BUILD_TESTING)
++  add_subdirectory(Testing)
++endif()
+-- 
+2.39.3
+

@@ -1,0 +1,24 @@
+From afa8d2b224200b871a3dccf2858098b859b2cd59 Mon Sep 17 00:00:00 2001
+From: Rafael Palomar <rafael.palomar@ous-research.no>
+Date: Mon, 6 Mar 2023 08:26:33 +0100
+Subject: [PATCH 02/15] ENH: Print external dependencies variables
+
+---
+ CMake/ExternalProjectDependency.cmake | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/CMake/ExternalProjectDependency.cmake b/CMake/ExternalProjectDependency.cmake
+index 55d3b8afe5..caa2f77c7c 100644
+--- a/CMake/ExternalProjectDependency.cmake
++++ b/CMake/ExternalProjectDependency.cmake
+@@ -1057,6 +1057,7 @@ macro(ExternalProject_SetIfNotDefined var defaultvalue)
+     endif()
+     set(${var} "${defaultvalue}")
+   endif()
++message(STATUS "${var}=${${var}}")
+ endmacro()
+ 
+ #.rst:
+-- 
+2.39.3
+
