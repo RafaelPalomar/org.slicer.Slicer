@@ -1,7 +1,7 @@
-From 09de3fae3d5ec7b63a7a2ed7249dd193ec80a1ed Mon Sep 17 00:00:00 2001
+From 102cc9567942399d4da87474b9dc46d3b2dfae6d Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Sat, 24 Jun 2023 22:45:06 +0200
-Subject: [PATCH] ENH: Add user configuration to pip (un-)install
+Subject: [PATCH 15/15] ENH: Add user configuration to pip (un-)install
 
 ---
  Base/Python/slicer/util.py                    | 4 ++--
@@ -9,10 +9,10 @@ Subject: [PATCH] ENH: Add user configuration to pip (un-)install
  2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/Base/Python/slicer/util.py b/Base/Python/slicer/util.py
-index 238e13efc3..12fbaf602b 100644
+index d49b0c7878..053019c777 100644
 --- a/Base/Python/slicer/util.py
 +++ b/Base/Python/slicer/util.py
-@@ -3584,9 +3584,9 @@ def pip_install(requirements):
+@@ -3595,9 +3595,9 @@ def pip_install(requirements):
      if type(requirements) == str:
          # shlex.split splits string the same way as the shell (keeping quoted string as a single argument)
          import shlex
@@ -53,5 +53,5 @@ index e5d0cce6a2..8787979a60 100644
  
    # External projects - pythonpath
 -- 
-2.39.3
+2.41.0
 

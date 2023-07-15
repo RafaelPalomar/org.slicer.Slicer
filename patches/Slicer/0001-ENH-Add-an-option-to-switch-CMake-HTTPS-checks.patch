@@ -1,4 +1,4 @@
-From 141aabfd03abcfcc2e8a13d5df543d898ecd8970 Mon Sep 17 00:00:00 2001
+From 11f08025945a71923b145eb6742b100090096400 Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Mon, 20 Feb 2023 07:10:53 +0100
 Subject: [PATCH 01/15] ENH: Add an option to switch CMake HTTPS checks
@@ -12,10 +12,10 @@ Slicer under network-isolated environments (i.e., flatpak).
  2 files changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d4d0f244ba..1f6adde067 100644
+index fb418d39f5..5d43146139 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -89,6 +89,15 @@ set(CMAKE_MODULE_PATH
+@@ -93,6 +93,15 @@ set(CMAKE_MODULE_PATH
  set(Slicer_CMAKE_DIR ${Slicer_SOURCE_DIR}/CMake)
  set(Slicer_EXTENSIONS_CMAKE_DIR ${Slicer_SOURCE_DIR}/Extensions/CMake)
  
@@ -32,7 +32,7 @@ index d4d0f244ba..1f6adde067 100644
  # https://www.slicer.org/w/index.php/Documentation/Nightly/Developers/DevelopmentWithGit
  #-----------------------------------------------------------------------------
 diff --git a/SuperBuild.cmake b/SuperBuild.cmake
-index 912c2f1c42..bc4d4f5cea 100644
+index 5e11491a16..7f03bcdafb 100644
 --- a/SuperBuild.cmake
 +++ b/SuperBuild.cmake
 @@ -22,7 +22,9 @@
@@ -47,5 +47,5 @@ index 912c2f1c42..bc4d4f5cea 100644
  #-----------------------------------------------------------------------------
  # Git protocol option
 -- 
-2.39.3
+2.41.0
 

@@ -1,4 +1,4 @@
-From afa8d2b224200b871a3dccf2858098b859b2cd59 Mon Sep 17 00:00:00 2001
+From 9d996b1fd79be1c706dbd634516b1620d80591b6 Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Mon, 6 Mar 2023 08:26:33 +0100
 Subject: [PATCH 02/15] ENH: Print external dependencies variables
@@ -20,5 +20,5 @@ index 55d3b8afe5..caa2f77c7c 100644
  
  #.rst:
 -- 
-2.39.3
+2.41.0
 

@@ -1,4 +1,4 @@
-From 58e479b54c836948f669bf4ca38e153f5c8b156e Mon Sep 17 00:00:00 2001
+From d1f3ca028f376c5ff169d6933faee66f55e63c7d Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Thu, 20 Apr 2023 15:42:51 +0200
 Subject: [PATCH 07/15] ENH: Expose python wheel dependencies
@@ -8,19 +8,19 @@ Subject: [PATCH 07/15] ENH: Expose python wheel dependencies
  ...ython-extension-manager-requirements.cmake | 20 ++++++++++++++-
  ...n-extension-manager-ssl-requirements.cmake | 18 ++++++++++++-
  SuperBuild/External_python-numpy.cmake        | 18 ++++++++++++-
- SuperBuild/External_python-pip.cmake          | 20 +++++++++++++--
- ...xternal_python-pythonqt-requirements.cmake | 20 +++++++++++++--
+ SuperBuild/External_python-pip.cmake          | 18 ++++++++++++-
+ ...xternal_python-pythonqt-requirements.cmake | 18 ++++++++++++-
  ...xternal_python-requests-requirements.cmake | 18 ++++++++++++-
  SuperBuild/External_python-scipy.cmake        | 25 +++++++++++++++++--
  SuperBuild/External_python-setuptools.cmake   | 23 ++++++++++++++---
  SuperBuild/External_python-wheel.cmake        | 18 ++++++++++++-
- 10 files changed, 182 insertions(+), 16 deletions(-)
+ 10 files changed, 180 insertions(+), 14 deletions(-)
 
 diff --git a/SuperBuild/External_python-dicom-requirements.cmake b/SuperBuild/External_python-dicom-requirements.cmake
-index 4f88dff880..1a5ad2d05b 100644
+index 8f71ca6580..d36252ef0d 100644
 --- a/SuperBuild/External_python-dicom-requirements.cmake
 +++ b/SuperBuild/External_python-dicom-requirements.cmake
-@@ -79,6 +79,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -75,6 +75,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
    # [/dicomweb-client]
    ]===])
  
@@ -43,7 +43,7 @@ index 4f88dff880..1a5ad2d05b 100644
    ExternalProject_Add(${proj}
      ${${proj}_EP_ARGS}
      DOWNLOAD_COMMAND ""
-@@ -86,7 +102,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -82,7 +98,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
      BUILD_IN_SOURCE 1
      CONFIGURE_COMMAND ""
      BUILD_COMMAND ""
@@ -91,10 +91,10 @@ index 15cee0f6ee..3200441ce7 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 diff --git a/SuperBuild/External_python-extension-manager-ssl-requirements.cmake b/SuperBuild/External_python-extension-manager-ssl-requirements.cmake
-index dba7d7194d..567d8066b7 100644
+index cde24391e1..5c8c5332b5 100644
 --- a/SuperBuild/External_python-extension-manager-ssl-requirements.cmake
 +++ b/SuperBuild/External_python-extension-manager-ssl-requirements.cmake
-@@ -99,6 +99,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -120,6 +120,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
    # [/PyGithub]
    ]===])
  
@@ -117,7 +117,7 @@ index dba7d7194d..567d8066b7 100644
    ExternalProject_Add(${proj}
      ${${proj}_EP_ARGS}
      DOWNLOAD_COMMAND ""
-@@ -106,7 +122,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -127,7 +143,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
      BUILD_IN_SOURCE 1
      CONFIGURE_COMMAND ""
      BUILD_COMMAND ""
@@ -127,10 +127,10 @@ index dba7d7194d..567d8066b7 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 diff --git a/SuperBuild/External_python-numpy.cmake b/SuperBuild/External_python-numpy.cmake
-index c2c6080b8b..4ccc0190a9 100644
+index df7c01b00c..cb976d7c39 100644
 --- a/SuperBuild/External_python-numpy.cmake
 +++ b/SuperBuild/External_python-numpy.cmake
-@@ -47,6 +47,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -46,6 +46,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
    # [/numpy]
    ]===])
  
@@ -153,7 +153,7 @@ index c2c6080b8b..4ccc0190a9 100644
    ExternalProject_Add(${proj}
      ${${proj}_EP_ARGS}
      DOWNLOAD_COMMAND ""
-@@ -54,7 +70,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -53,7 +69,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
      BUILD_IN_SOURCE 1
      CONFIGURE_COMMAND ""
      BUILD_COMMAND ""
@@ -163,15 +163,10 @@ index c2c6080b8b..4ccc0190a9 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 diff --git a/SuperBuild/External_python-pip.cmake b/SuperBuild/External_python-pip.cmake
-index 2e2b2011e1..64fd3320ad 100644
+index 0ce63d1a0e..d365e7cdab 100644
 --- a/SuperBuild/External_python-pip.cmake
 +++ b/SuperBuild/External_python-pip.cmake
-@@ -27,10 +27,26 @@ if(NOT Slicer_USE_SYSTEM_${proj})
-   set(requirements_file ${CMAKE_BINARY_DIR}/${proj}-requirements.txt)
-   file(WRITE ${requirements_file} [===[
-   # [pip]
--  pip==23.0.1 --hash=sha256:236bcb61156d76c4b8a05821b988c7b8c35bf0da28a4b614e8d6ab5212c25c6f
-+  pip==23.1 --hash=sha256:64b1d4528e491aa835ec6ece0c1ac40ce6ab6d886e60740f6519db44b2e9634d
+@@ -31,6 +31,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
    # [/pip]
    ]===])
  
@@ -204,18 +199,9 @@ index 2e2b2011e1..64fd3320ad 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 diff --git a/SuperBuild/External_python-pythonqt-requirements.cmake b/SuperBuild/External_python-pythonqt-requirements.cmake
-index 884773bd33..8584ac9078 100644
+index b463195ca4..6939cb4820 100644
 --- a/SuperBuild/External_python-pythonqt-requirements.cmake
 +++ b/SuperBuild/External_python-pythonqt-requirements.cmake
-@@ -32,7 +32,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
-   set(requirements_file ${CMAKE_BINARY_DIR}/${proj}-requirements.txt)
-   file(WRITE ${requirements_file} [===[
-   # [packaging]
--  packaging==23.0 --hash=sha256:714ac14496c3e68c99c29b00845f7a2b85f3bb6f1078fd9f72fd20f0570002b2
-+  packaging==23.1 --hash=sha256:994793af429502c4ea2ebf6bf664629d07c1a9fe974af92966e4b8d2df7edc61
-   # [/packaging]
-   # [pyparsing]
-   pyparsing==3.0.9 --hash=sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc
 @@ -42,6 +42,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
    # [/six]
    ]===])
@@ -249,7 +235,7 @@ index 884773bd33..8584ac9078 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 diff --git a/SuperBuild/External_python-requests-requirements.cmake b/SuperBuild/External_python-requests-requirements.cmake
-index 05deb6200a..9cff5b4dd9 100644
+index 856f2685b4..7cb9c92deb 100644
 --- a/SuperBuild/External_python-requests-requirements.cmake
 +++ b/SuperBuild/External_python-requests-requirements.cmake
 @@ -61,6 +61,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
@@ -285,12 +271,12 @@ index 05deb6200a..9cff5b4dd9 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 diff --git a/SuperBuild/External_python-scipy.cmake b/SuperBuild/External_python-scipy.cmake
-index 40b04b1be6..d3304e5f80 100644
+index 379d8ad2a2..3e04a09915 100644
 --- a/SuperBuild/External_python-scipy.cmake
 +++ b/SuperBuild/External_python-scipy.cmake
-@@ -42,7 +42,28 @@ if(NOT Slicer_USE_SYSTEM_${proj})
-                 --hash=sha256:1b4735d6c28aad3cdcf52117e0e91d6b39acd4272f3f5cd9907c24ee931ad601 \
-                 --hash=sha256:7ff7f37b1bf4417baca958d254e8e2875d0cc23aaadbe65b3d5b3077b0eb23ea
+@@ -44,7 +44,28 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+                 --hash=sha256:396fae3f8c12ad14c5f3eb40499fd06a6fef8393a6baa352a652ecd51e74e029 \
+                 --hash=sha256:be8c962a821957fdde8c4044efdab7a140c13294997a407eaee777acf63cbf0c
    # [/scipy]
 -  ]===])
 +  # [meson-python]
@@ -318,7 +304,7 @@ index 40b04b1be6..d3304e5f80 100644
  
    ExternalProject_Add(${proj}
      ${${proj}_EP_ARGS}
-@@ -51,7 +72,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
+@@ -53,7 +74,7 @@ if(NOT Slicer_USE_SYSTEM_${proj})
      BUILD_IN_SOURCE 1
      CONFIGURE_COMMAND ""
      BUILD_COMMAND ""
@@ -328,7 +314,7 @@ index 40b04b1be6..d3304e5f80 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 diff --git a/SuperBuild/External_python-setuptools.cmake b/SuperBuild/External_python-setuptools.cmake
-index 661003e5bb..7a8f673c51 100644
+index b5e81ca940..f57812a6c4 100644
 --- a/SuperBuild/External_python-setuptools.cmake
 +++ b/SuperBuild/External_python-setuptools.cmake
 @@ -30,6 +30,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
@@ -370,7 +356,7 @@ index 661003e5bb..7a8f673c51 100644
    ExternalProject_GenerateProjectDescription_Step(${proj}
      VERSION ${_version}
 diff --git a/SuperBuild/External_python-wheel.cmake b/SuperBuild/External_python-wheel.cmake
-index bae6337328..82310d1a14 100644
+index a14acb8029..dd2ce82def 100644
 --- a/SuperBuild/External_python-wheel.cmake
 +++ b/SuperBuild/External_python-wheel.cmake
 @@ -31,6 +31,22 @@ if(NOT Slicer_USE_SYSTEM_${proj})
@@ -406,5 +392,5 @@ index bae6337328..82310d1a14 100644
      DEPENDS
        ${${proj}_DEPENDENCIES}
 -- 
-2.39.3
+2.41.0
 

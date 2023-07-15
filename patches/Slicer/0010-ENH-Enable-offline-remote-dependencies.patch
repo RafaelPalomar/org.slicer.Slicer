@@ -1,4 +1,4 @@
-From 621935753b7c08556007615ee44d60545cceeab3 Mon Sep 17 00:00:00 2001
+From eb316191db8650a8ea0cd57f1767fd294ce19fcf Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Fri, 5 May 2023 07:06:29 +0200
 Subject: [PATCH 10/15] ENH: Enable offline remote dependencies
@@ -23,5 +23,5 @@ index 9fc5cecc93..c5bcbc8480 100644
    if(_add_source)
      message(STATUS "Remote - ${projectname} [OK]")
 -- 
-2.39.3
+2.41.0
 

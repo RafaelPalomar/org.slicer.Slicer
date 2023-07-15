@@ -1,4 +1,4 @@
-From fb49de511cf07c95131678082e5ebeffd605b448 Mon Sep 17 00:00:00 2001
+From b1bbcb0321d5df96acef2ede6fd93435f3ae9217 Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Mon, 6 Mar 2023 08:27:44 +0100
 Subject: [PATCH 05/15] ENH: Expose OpenSSL dependencies variables
@@ -38,5 +38,5 @@ index 23ee5644d3..940dbb2755 100644
        SOURCE_DIR ${EP_SOURCE_DIR}
        BUILD_IN_SOURCE 1
 -- 
-2.39.3
+2.41.0
 

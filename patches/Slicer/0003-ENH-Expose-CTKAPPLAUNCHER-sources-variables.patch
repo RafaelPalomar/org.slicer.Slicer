@@ -1,4 +1,4 @@
-From b2d3010d18b8873ca1956a8ef2eeba82288c5cf5 Mon Sep 17 00:00:00 2001
+From 4cd59c63b49a23d7876b57a48c0c22c95981859a Mon Sep 17 00:00:00 2001
 From: Rafael Palomar <rafael.palomar@ous-research.no>
 Date: Mon, 6 Mar 2023 08:27:05 +0100
 Subject: [PATCH 03/15] ENH: Expose CTKAPPLAUNCHER sources variables
@@ -44,5 +44,5 @@ index 6f90aaa239..fac72ec270 100644
        SOURCE_DIR ${EP_BINARY_DIR}
        BUILD_IN_SOURCE 1
 -- 
-2.39.3
+2.41.0
 
